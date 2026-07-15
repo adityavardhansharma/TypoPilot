@@ -26,8 +26,109 @@ from transformers import (
     DataCollatorForSeq2Seq,
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
+    TrainerCallback,
     set_seed,
 )
+
+
+class DashboardCallback(TrainerCallback):
+    """Streams live progress to ``progress.json`` for the local dashboard.
+
+    The file is rewritten atomically on every log/eval/save event, so the
+    dashboard (web/dashboard.html) can poll it without ever reading a
+    half-written file.
+    """
+
+    def __init__(self, path: Path, experiment_name: str):
+        self.path = path
+        self.state = {
+            "experiment": experiment_name,
+            "status": "starting",
+            "started_at": None,
+            "updated_at": None,
+            "global_step": 0,
+            "max_steps": 0,
+            "percent": 0.0,
+            "epoch": 0.0,
+            "num_epochs": 0,
+            "loss": None,
+            "eval_loss": None,
+            "learning_rate": None,
+            "elapsed_seconds": 0,
+            "eta_seconds": None,
+            "steps_per_second": None,
+            "peak_vram_gb": None,
+            "loss_history": [],
+            "eval_history": [],
+            "log_lines": [],
+        }
+        self._started = None
+
+    def _log_line(self, message: str) -> None:
+        stamp = time.strftime("%H:%M:%S")
+        self.state["log_lines"].append(f"[{stamp}] {message}")
+        self.state["log_lines"] = self.state["log_lines"][-120:]
+
+    def _flush(self) -> None:
+        self.state["updated_at"] = time.time()
+        if self._started is not None:
+            elapsed = time.time() - self._started
+            self.state["elapsed_seconds"] = round(elapsed)
+            step, max_steps = self.state["global_step"], self.state["max_steps"]
+            if step > 0 and max_steps:
+                rate = step / elapsed
+                self.state["steps_per_second"] = round(rate, 3)
+                self.state["eta_seconds"] = round((max_steps - step) / rate)
+                self.state["percent"] = round(100.0 * step / max_steps, 2)
+        if torch.cuda.is_available():
+            self.state["peak_vram_gb"] = round(
+                torch.cuda.max_memory_allocated() / 1024**3, 2
+            )
+        tmp = self.path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(self.state), encoding="utf-8")
+        tmp.replace(self.path)
+
+    def on_train_begin(self, args, state, control, **kwargs):
+        self._started = time.time()
+        self.state["started_at"] = self._started
+        self.state["status"] = "training"
+        self.state["max_steps"] = state.max_steps
+        self.state["num_epochs"] = args.num_train_epochs
+        self._log_line(f"training started: {state.max_steps} optimizer steps planned")
+        self._flush()
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        logs = logs or {}
+        self.state["global_step"] = state.global_step
+        self.state["epoch"] = round(state.epoch or 0.0, 3)
+        if "loss" in logs:
+            self.state["loss"] = logs["loss"]
+            self.state["learning_rate"] = logs.get("learning_rate")
+            self.state["loss_history"].append([state.global_step, logs["loss"]])
+            self._log_line(
+                f"step {state.global_step}/{state.max_steps}  "
+                f"loss {logs['loss']:.4f}  lr {logs.get('learning_rate', 0):.2e}"
+            )
+        self._flush()
+
+    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
+        metrics = metrics or {}
+        if "eval_loss" in metrics:
+            self.state["eval_loss"] = metrics["eval_loss"]
+            self.state["eval_history"].append([state.global_step, metrics["eval_loss"]])
+            self._log_line(
+                f"eval @ step {state.global_step}: eval_loss {metrics['eval_loss']:.4f}"
+            )
+        self._flush()
+
+    def on_save(self, args, state, control, **kwargs):
+        self._log_line(f"checkpoint saved at step {state.global_step}")
+        self._flush()
+
+    def on_train_end(self, args, state, control, **kwargs):
+        self.state["status"] = "completed"
+        self._log_line("training completed")
+        self._flush()
 
 
 class CorrectionDataset(Dataset):
@@ -137,16 +238,26 @@ def main(argv: list[str] | None = None) -> int:
         dataloader_pin_memory=torch.cuda.is_available(),
     )
 
+    dashboard = DashboardCallback(
+        output_dir / "progress.json", config["experiment_name"]
+    )
     trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         data_collator=DataCollatorForSeq2Seq(tokenizer, model=model),
+        callbacks=[dashboard],
     )
 
     started = time.time()
-    result = trainer.train(resume_from_checkpoint=args.resume or None)
+    try:
+        result = trainer.train(resume_from_checkpoint=args.resume or None)
+    except BaseException as error:
+        dashboard.state["status"] = "failed"
+        dashboard._log_line(f"training failed: {type(error).__name__}: {error}")
+        dashboard._flush()
+        raise
     duration_minutes = (time.time() - started) / 60
 
     trainer.save_model(str(output_dir / "checkpoint-best"))

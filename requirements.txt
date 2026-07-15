@@ -4,6 +4,7 @@
 #   python -m pip install -r requirements.txt
 torch==2.7.1
 transformers==5.5.4
+accelerate>=1.1.0
 numpy
 pyarrow==17.0.0
 symspellpy==6.10.0
