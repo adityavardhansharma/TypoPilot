@@ -7,6 +7,7 @@ from typopilot.eval.metrics import (
     exact_match_multi,
     levenshtein,
     wer,
+    wer_multi,
 )
 
 
