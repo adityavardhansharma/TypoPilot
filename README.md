@@ -6,11 +6,20 @@ Full specification: [idea.md](idea.md).
 ## Current status
 
 - [x] **Step 1 — Synthetic noise generator** (`src/typopilot/noise/`)
-- [ ] Step 2 — Pilot dataset from BEA-2019 (clean targets + real edit pairs)
-- [ ] Step 3 — Baselines (SymSpell + rule-based)
-- [ ] Step 4 — ByT5-small pilot fine-tune (FP32, 6GB VRAM config)
+- [x] **Step 2 — Pilot dataset** (`src/typopilot/data/`): 17,100 train / 900 val
+      pairs from BEA-2019 + DailyDialog, plus an 800-example fixed self-test
+      suite; JFLEG reserved as an untouched benchmark
+- [x] **Step 3 — Baselines** (`src/typopilot/baselines/`): identity, rules,
+      SymSpell — SymSpell overcorrects 44% of examples, motivating the model
+- [ ] Step 4 — ByT5-small pilot fine-tune (FP32, 6GB VRAM config ready in
+      `configs/training/byt5_small_pilot.json`)
 - [ ] Step 5 — Full training run
 - [ ] Step 6 — Evaluation, error analysis, report
+
+Datasets are not committed (BEA-2019 and JFLEG/DailyDialog are
+non-commercial-licensed); re-download per `data/raw` instructions in the
+research log. DailyDialog's original host is dead — use the
+`roskoN/dailydialog` parquet mirror on Hugging Face.
 
 ## Setup
 
