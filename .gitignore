@@ -1,9 +1,9 @@
 # Datasets are downloaded locally and must not be redistributed
 # (BEA-2019 and JFLEG/DailyDialog carry non-commercial licences).
-data/
+/data/
 
 # Experiment outputs (checkpoints are too large for git)
-experiments/
+/experiments/
 
 # Python
 __pycache__/
