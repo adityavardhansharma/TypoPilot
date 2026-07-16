@@ -5,6 +5,10 @@
 # Experiment outputs (checkpoints are too large for git)
 /experiments/
 
+# Packaged dataset for cloud upload (build artifact; regenerate with
+# scripts/make_data_zip.ps1). Contains licensed data — do not commit.
+/data_final.zip
+
 # Python
 .venv/
 __pycache__/
