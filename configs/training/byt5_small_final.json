@@ -1,0 +1,28 @@
+{
+  "experiment_name": "byt5-small-final-002",
+  "model_name": "google/byt5-small",
+  "train_file": "data/final/train.jsonl",
+  "val_file": "data/final/val.jsonl",
+  "output_dir": "experiments/byt5-small-final-002",
+
+  "max_input_bytes": 320,
+  "max_target_bytes": 320,
+
+  "per_device_train_batch_size": 2,
+  "gradient_accumulation_steps": 8,
+  "learning_rate": 3e-4,
+  "num_train_epochs": 1.5,
+  "warmup_ratio": 0.02,
+  "weight_decay": 0.01,
+  "lr_scheduler_type": "linear",
+
+  "fp32_note": "T5-family models produce NaN losses in fp16 and this GPU (GTX 1660 Ti, Turing) has no bf16, so training runs in full fp32.",
+  "licence_note": "Trained exclusively on commercially usable data: Tatoeba (CC-BY), C4_200M (ODC-BY), misspell dict (MIT), Wikipedia lists (CC BY-SA), own synthetic generator.",
+  "gradient_checkpointing": true,
+
+  "eval_steps": 500,
+  "save_steps": 500,
+  "save_total_limit": 2,
+  "logging_steps": 25,
+  "seed": 29
+}
