@@ -7,9 +7,10 @@ from typopilot.noise.ops import OPS
 
 SAMPLE = "What is the weather, and how did the AI perform in the task given to it?"
 
-# abbreviate_word needs words from the abbreviation dictionary to fire.
+# Ops that need specific material in the sentence to fire.
 _OP_SAMPLES = {
     "abbreviate_word": "Can you please tell me about the meeting before tomorrow?",
+    "drop_apostrophe": "I don't think it's the model's fault.",
 }
 
 

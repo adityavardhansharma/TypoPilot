@@ -38,9 +38,9 @@ class SeverityProfile:
     weights: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self):
-        unknown = set(self.weights) - set(OPS)
-        if unknown:
-            raise ValueError(f"profile {self.name!r} references unknown ops: {sorted(unknown)}")
+        # Op-name validation happens in NoiseGenerator, which knows the full
+        # op table (stateless OPS plus dictionary-backed ops like
+        # real_misspelling that only exist when a dictionary is supplied).
         if not self.weights:
             raise ValueError(f"profile {self.name!r} has no operation weights")
 
@@ -65,6 +65,11 @@ def _default_weights(**overrides: float) -> dict[str, float]:
         "repeat_word": 1.0,
         "swap_adjacent_words": 0.75,
         "abbreviate_word": 1.5,
+        "drop_apostrophe": 1.5,
+        # Real human misspellings (received -> recieved). Weighted high:
+        # they are the dominant error class in real typing. Silently skipped
+        # when the generator has no misspelling dictionary.
+        "real_misspelling": 3.0,
     }
     weights.update(overrides)
     return weights
@@ -140,9 +145,30 @@ def _derive_seed(seed: int, example_id: str, severity: str) -> int:
 class NoiseGenerator:
     """Applies a severity profile to clean text, deterministically."""
 
-    def __init__(self, seed: int = 13, profiles: dict[str, SeverityProfile] | None = None):
+    def __init__(
+        self,
+        seed: int = 13,
+        profiles: dict[str, SeverityProfile] | None = None,
+        misspellings: dict[str, list[str]] | None = None,
+    ):
         self.seed = seed
         self.profiles = profiles or PROFILES
+        self.ops = dict(OPS)
+        if misspellings:
+            from .ops import make_misspelling_op
+            self.ops["real_misspelling"] = make_misspelling_op(misspellings)
+
+        # Validate profiles against the ops actually available; weights for
+        # dictionary-backed ops that were not supplied are dropped silently
+        # so the same profile definitions work with or without a dictionary.
+        for profile in self.profiles.values():
+            known = {n: w for n, w in profile.weights.items() if n in self.ops}
+            unknown = set(profile.weights) - set(OPS) - {"real_misspelling"}
+            if unknown:
+                raise ValueError(
+                    f"profile {profile.name!r} references unknown ops: {sorted(unknown)}"
+                )
+            object.__setattr__(profile, "weights", known)
 
     def corrupt(
         self,
@@ -170,7 +196,7 @@ class NoiseGenerator:
         for _ in range(n_ops):
             for _ in range(_MAX_DRAWS_PER_SLOT):
                 name = rng.choices(op_names, weights=op_weights, k=1)[0]
-                result = OPS[name](current, rng)
+                result = self.ops[name](current, rng)
                 if result is not None:
                     current, entry = result
                     ops_log.append(entry)

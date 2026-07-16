@@ -313,6 +313,51 @@ def abbreviate_word(text: str, rng: random.Random):
     return " ".join(words), {"op": "abbreviate_word", "word": word, "replacement": words[wi]}
 
 
+def drop_apostrophe(text: str, rng: random.Random):
+    """don't -> dont, I'm -> Im"""
+    positions = [
+        i for i, ch in enumerate(text)
+        if ch == "'" and 0 < i < len(text) - 1
+        and text[i - 1].isalpha() and text[i + 1].isalpha()
+    ]
+    if not positions:
+        return None
+    i = rng.choice(positions)
+    out = text[:i] + text[i + 1:]
+    return out, {"op": "drop_apostrophe", "pos": i}
+
+
+def make_misspelling_op(mapping: dict[str, list[str]]):
+    """Build a ``real_misspelling`` op from a {correct: [wrong, ...]} dict.
+
+    Replaces a correctly spelled word with a real human misspelling
+    (received -> recieved), preserving leading capitalisation and trailing
+    punctuation. Returned function has the standard op signature.
+    """
+
+    def real_misspelling(text: str, rng: random.Random):
+        words = _words(text)
+        candidates = [
+            i for i, w in enumerate(words)
+            if w.lower().strip(string.punctuation) in mapping
+        ]
+        if not candidates:
+            return None
+        wi = rng.choice(candidates)
+        word = words[wi]
+        stripped = word.rstrip(string.punctuation)
+        trailing = word[len(stripped):]
+        wrong = rng.choice(mapping[stripped.lower()])
+        if stripped[:1].isupper():
+            wrong = wrong[:1].upper() + wrong[1:]
+        words[wi] = wrong + trailing
+        return " ".join(words), {
+            "op": "real_misspelling", "word": word, "replacement": words[wi],
+        }
+
+    return real_misspelling
+
+
 #: Registry of every operation, keyed by name. Severity profiles reference
 #: these names, so the set of names is a stable public interface.
 OPS = {
@@ -334,4 +379,5 @@ OPS = {
     "repeat_word": repeat_word,
     "swap_adjacent_words": swap_adjacent_words,
     "abbreviate_word": abbreviate_word,
+    "drop_apostrophe": drop_apostrophe,
 }
