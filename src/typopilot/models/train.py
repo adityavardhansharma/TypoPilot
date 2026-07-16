@@ -184,9 +184,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--resume", action="store_true",
                         help="resume from the latest checkpoint in output_dir")
+    parser.add_argument("--smoke", action="store_true",
+                        help="30-step smoke test: verifies the full pipeline "
+                             "(data, GPU, precision, checkpointing) cheaply")
     args = parser.parse_args(argv)
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    if args.smoke:
+        config["output_dir"] = config["output_dir"] + "-smoke"
+        config.update(eval_steps=10, save_steps=20, logging_steps=5)
     set_seed(config["seed"])
 
     output_dir = Path(config["output_dir"])
@@ -222,8 +228,10 @@ def main(argv: list[str] | None = None) -> int:
         warmup_ratio=config["warmup_ratio"],
         weight_decay=config["weight_decay"],
         lr_scheduler_type=config["lr_scheduler_type"],
-        fp16=False,  # see fp32_note in the config
-        bf16=False,
+        # Precision is config-driven: FP32 on the local GTX 1660 Ti (T5 NaNs
+        # in fp16, Turing lacks bf16); bf16 on Ampere/Ada+ cloud GPUs.
+        fp16=bool(config.get("fp16", False)),
+        bf16=bool(config.get("bf16", False)),
         eval_strategy="steps",
         eval_steps=config["eval_steps"],
         save_strategy="steps",
@@ -232,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         logging_steps=config["logging_steps"],
+        max_steps=30 if args.smoke else -1,
         logging_dir=str(output_dir / "logs"),
         report_to=["tensorboard"],
         seed=config["seed"],
