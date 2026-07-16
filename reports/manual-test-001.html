@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypoPilot — Manual Test 001</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zilla+Slab:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b09; --panel: #0c120e; --panel-edge: #16211a;
+    --ink: #c9dccf; --ink-dim: #5d7263;
+    --phosphor: #46e08a; --amber: #e0b346; --red: #e05a46;
+    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    --display: "Zilla Slab", Georgia, serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--mono); font-size: 14px; }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px);
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 24px 60px; }
+  header { display: flex; align-items: baseline; gap: 18px; border-bottom: 1px solid var(--panel-edge); padding-bottom: 18px; margin-bottom: 10px; }
+  header h1 { font-family: var(--display); font-size: 28px; color: var(--ink); }
+  header h1 em { color: var(--phosphor); font-style: normal; }
+  .sub { color: var(--ink-dim); font-size: 12px; margin-bottom: 26px; line-height: 1.7; }
+  .legend { display: flex; gap: 22px; margin: 14px 0 30px; font-size: 12px; color: var(--ink-dim); }
+  .legend b { font-weight: 500; padding: 1px 7px; border-radius: 2px; }
+  .b-in { background: rgba(224,90,70,.18); color: #f0937f; text-decoration: line-through; }
+  .b-out { background: rgba(70,224,138,.16); color: var(--phosphor); }
+
+  .case { background: var(--panel); border: 1px solid var(--panel-edge); margin-bottom: 22px; }
+  .case-head { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--panel-edge); }
+  .case-head h2 { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-dim); font-weight: 500; }
+  .lat { margin-left: auto; font-size: 12px; color: var(--amber); }
+  .row { display: grid; grid-template-columns: 92px 1fr; gap: 14px; padding: 14px 18px; line-height: 1.9; }
+  .row + .row { border-top: 1px dashed var(--panel-edge); }
+  .row b { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-dim); font-weight: 500; padding-top: 5px; }
+  .row.model b { color: var(--phosphor); }
+  .text { font-size: 14.5px; }
+  .del { background: rgba(224,90,70,.18); color: #f0937f; text-decoration: line-through; padding: 1px 4px; border-radius: 2px; }
+  .add { background: rgba(70,224,138,.16); color: var(--phosphor); padding: 1px 4px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Typo<em>Pilot</em> // manual test 001</h1>
+  </header>
+  <p class="sub">
+    checkpoint: byt5-small-pilot-001/checkpoint-best · GPU (GTX 1660 Ti), FP32, greedy decoding ·
+    inference byte-cap raised to 1024 for the paragraph (training cap was 192 — long inputs are out-of-distribution for this pilot)
+  </p>
+  <div class="legend">
+    <span><b class="b-in">removed / replaced</b> in your input</span>
+    <span><b class="b-out">added / changed</b> by the model</span>
+  </div>
+  <div id="cases"></div>
+</div>
+
+<script>
+const RESULTS = [
+  {
+    id: "paragraph — 419 chars", latency_ms: 11485,
+    input: "hey i was cheking teh modle resluts and i thnik the eng lish sentnces are working fine but some times it still changes the mean ing of the text. when the para gets long the modle also repetes words, miss es a full line, or puts words in the rong place. we need to chek how fasst it fixes the text and whether the corected output still means teh same thing. after this test we cna decied if the pilot model is gud enogh for full train ing.",
+    output: "Hey, I was checking the modle resluts and I think the English sentences are working fine but sometimes it still changes the meaning of the text. when the para gets long, the modle also repetes words, misses a full line, or puts words in the rong place. We need to check how fast it fixes the text and whether the corected output still means the same thing. after this test we can decide if the pilot model is guess enough for full training."
+  },
+  {
+    id: "sentence 1", latency_ms: 1255,
+    input: "I recieved your mesage and will reply tommorow.",
+    output: "I received your mesage and will reply tomorrow."
+  },
+  {
+    id: "sentence 2", latency_ms: 1113,
+    input: "can you chek if The model is working corectly?",
+    output: "Can you check if the model is working correctly?"
+  },
+  {
+    id: "sentence 3", latency_ms: 1538,
+    input: "I was test ing the model but it did not fixall the spelling erors.",
+    output: "I was testing the model but it did not fixall the spelling erors."
+  },
+  {
+    id: "sentence 4", latency_ms: 1148,
+    input: "Yesterday I to the office went but nobody there was.",
+    output: "Yesterday I went to the office but nobody was there."
+  },
+  {
+    id: "sentence 5", latency_ms: 1532,
+    input: "waht do yuo thnik abotu the resluts we got form the latset modle test",
+    output: "What do you think about the results we got form the lastest model test?"
+  },
+  {
+    id: "sentence 6", latency_ms: 1614,
+    input: "the new upd ate is work ing better but it still changs some words rongly",
+    output: "The new update is working better, but it still changes some words rongly."
+  },
+  {
+    id: "sentence 7", latency_ms: 1934,
+    input: "i dont know why the modle gave this ans wer because the ques tion was completly diffrent",
+    output: "I don't know why the model gave this answer because the question was completly different."
+  }
+];
+
+// word-level LCS diff
+function diff(a, b) {
+  const A = a.split(/\s+/), B = b.split(/\s+/);
+  const m = A.length, n = B.length;
+  const L = Array.from({length: m + 1}, () => new Array(n + 1).fill(0));
+  for (let i = m - 1; i >= 0; i--)
+    for (let j = n - 1; j >= 0; j--)
+      L[i][j] = A[i] === B[j] ? L[i+1][j+1] + 1 : Math.max(L[i+1][j], L[i][j+1]);
+  const ops = [];
+  let i = 0, j = 0;
+  while (i < m && j < n) {
+    if (A[i] === B[j]) { ops.push(["=", A[i]]); i++; j++; }
+    else if (L[i+1][j] >= L[i][j+1]) { ops.push(["-", A[i]]); i++; }
+    else { ops.push(["+", B[j]]); j++; }
+  }
+  while (i < m) ops.push(["-", A[i++]]);
+  while (j < n) ops.push(["+", B[j++]]);
+  return ops;
+}
+
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function render(kind, ops) {
+  return ops.map(([op, word]) => {
+    if (op === "=") return esc(word);
+    if (op === "-" && kind === "input") return `<span class="del">${esc(word)}</span>`;
+    if (op === "+" && kind === "output") return `<span class="add">${esc(word)}</span>`;
+    return null;
+  }).filter(Boolean).join(" ");
+}
+
+document.getElementById("cases").innerHTML = RESULTS.map(r => {
+  const ops = diff(r.input, r.output);
+  return `<div class="case">
+    <div class="case-head"><h2>${r.id}</h2><span class="lat">${r.latency_ms.toLocaleString()} ms</span></div>
+    <div class="row"><b>you gave</b><div class="text">${render("input", ops)}</div></div>
+    <div class="row model"><b>model gave</b><div class="text">${render("output", ops)}</div></div>
+  </div>`;
+}).join("");
+</script>
+</body>
+</html>
