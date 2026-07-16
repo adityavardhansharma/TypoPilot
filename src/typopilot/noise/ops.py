@@ -345,12 +345,13 @@ def make_misspelling_op(mapping: dict[str, list[str]]):
             return None
         wi = rng.choice(candidates)
         word = words[wi]
-        stripped = word.rstrip(string.punctuation)
-        trailing = word[len(stripped):]
-        wrong = rng.choice(mapping[stripped.lower()])
-        if stripped[:1].isupper():
+        core = word.strip(string.punctuation)
+        start = word.find(core)
+        leading, trailing = word[:start], word[start + len(core):]
+        wrong = rng.choice(mapping[core.lower()])
+        if core[:1].isupper():
             wrong = wrong[:1].upper() + wrong[1:]
-        words[wi] = wrong + trailing
+        words[wi] = leading + wrong + trailing
         return " ".join(words), {
             "op": "real_misspelling", "word": word, "replacement": words[wi],
         }
