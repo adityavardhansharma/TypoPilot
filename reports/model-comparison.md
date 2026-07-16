@@ -115,6 +115,42 @@ treats as most severe (spec §13, §21).
 (`corectly`, `erors`, `changs`, `rongly`, `lastest`), and it under-capitalises
 all-lowercase paragraphs. Real-misspelling coverage improved but is not complete.
 
+### Automated suite scoring (final-002 vs baselines, 900-example commercial suite)
+
+| System | CER | WER | Exact match | Overcorrection |
+|---|---|---|---|---|
+| identity (do nothing) | 0.1270 | 0.3675 | 11.2% | 0% |
+| SymSpell (best classical) | 0.1068 | 0.2650 | 18.8% | 24.7% |
+| **final-002** | **0.0480** | **0.0933** | **58.2%** | **6.1%** |
+
+The final model **more than halves** SymSpell's error rate and **triples** its
+exact-match, while overcorrecting 4× less. Per category:
+
+| Category | CER | Exact match | CER improvement | Overcorrection |
+|---|---|---|---|---|
+| no_change_needed | 0.0000 | **100.0%** | 0.000 | 0.0% |
+| english_light | 0.0115 | 84.0% | +0.053 | 3.3% |
+| english_medium | 0.0194 | 78.0% | +0.104 | 4.0% |
+| english_heavy | 0.0520 | 51.3% | +0.154 | 1.3% |
+| english_extreme | 0.0593 | 48.0% | +0.204 | 2.0% |
+| paragraphs_multi | 0.0288 | 46.0% | +0.035 | 8.0% |
+| real_errors_c4 | 0.1463 | 6.7% | +0.005 | 21.3% |
+
+Highlights vs the pilot:
+
+- **no_change_needed: 100% exact match** (pilot: 91%) — the identity discipline is
+  now perfect; the model reliably leaves already-correct text untouched.
+- **paragraphs_multi CER 0.029** — the 25k multi-sentence training pairs paid off;
+  long inputs are handled cleanly, the pilot's biggest weakness.
+- **Improvement grows with noise severity** (+0.204 CER on extreme) — exactly the
+  regime the project targets.
+- **real_errors_c4 remains the weak spot** (6.7% EM, 21% overcorrection) — grammar
+  correction is harder and more subjective than typo repair, and the model tends to
+  over-edit here. This is the clearest target for future work.
+
+Automated latency (local 1660 Ti, FP32 greedy): median 1,124 ms · p90 3,444 ms ·
+p95 4,327 ms · short-sentence median 898 ms.
+
 ### Latency (local GTX 1660 Ti, FP32 greedy, warm)
 
 | | pilot-001 | final-002 |
