@@ -1,0 +1,30 @@
+{
+  "experiment_name": "byt5-small-final-003",
+  "model_name": "google/byt5-small",
+  "train_file": "data/final_250k/train.jsonl",
+  "val_file": "data/final_250k/val.jsonl",
+  "output_dir": "experiments/byt5-small-final-003",
+
+  "max_input_bytes": 320,
+  "max_target_bytes": 320,
+
+  "per_device_train_batch_size": 32,
+  "gradient_accumulation_steps": 1,
+  "learning_rate": 2.5e-4,
+  "num_train_epochs": 2.0,
+  "warmup_ratio": 0.03,
+  "weight_decay": 0.01,
+  "lr_scheduler_type": "cosine",
+
+  "bf16": true,
+  "precision_note": "bf16 requires Ampere/Ada+ (L40S). Use byt5_small_final.json (FP32) on local/T4.",
+  "data_note": "250k improved mixture: ~75% synthetic (minimal/light/medium/heavy/extreme via severity blend + real misspellings), 10% multi-sentence paragraphs, 10% identity, 5% C4 grammar (cut from 26%). Reuses test_suite_commercial (900 ex) with those sentences excluded from training.",
+  "licence_note": "Commercial-clean: Tatoeba CC-BY, C4_200M ODC-BY, misspell MIT, Wikipedia CC BY-SA, own generator.",
+  "gradient_checkpointing": false,
+
+  "eval_steps": 500,
+  "save_steps": 500,
+  "save_total_limit": 3,
+  "logging_steps": 25,
+  "seed": 41
+}
