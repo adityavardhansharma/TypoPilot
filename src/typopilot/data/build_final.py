@@ -60,7 +60,10 @@ MULTI_MAX_BYTES = 280           # concatenated clean text cap (training cap 320)
 # the trainer, and truncated TARGETS teach the model to drop sentence endings.
 MAX_PAIR_BYTES = 320
 
-SEVERITY_MIX = {"light": 1.0, "medium": 2.0, "heavy": 2.0, "extreme": 1.0}
+# Weighted toward near-correct / few-error examples: TypoPilot should learn
+# precise minimal correction, not aggressive rewriting. "minimal" is a single
+# subtle error; heavy/extreme are kept present but a minority.
+SEVERITY_MIX = {"minimal": 2.0, "light": 2.0, "medium": 2.0, "heavy": 1.5, "extreme": 1.0}
 
 TEST_SUITE = {
     "english_light": 150,

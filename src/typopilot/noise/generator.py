@@ -77,6 +77,14 @@ def _default_weights(**overrides: float) -> dict[str, float]:
 
 #: The four severity buckets from the spec (idea.md section 7).
 PROFILES: dict[str, SeverityProfile] = {
+    # Near-correct: exactly one subtle error. Teaches the model to fix the
+    # single mistake and leave everything else untouched (minimal-edit).
+    "minimal": SeverityProfile(
+        name="minimal",
+        ops_range=(1, 1),
+        max_ops_per_word=1.0,
+        weights=_default_weights(),
+    ),
     "light": SeverityProfile(
         name="light",
         ops_range=(1, 2),
