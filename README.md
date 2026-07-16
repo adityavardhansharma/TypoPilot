@@ -11,10 +11,11 @@ Full specification: [idea.md](idea.md).
       suite; JFLEG reserved as an untouched benchmark
 - [x] **Step 3 — Baselines** (`src/typopilot/baselines/`): identity, rules,
       SymSpell — SymSpell overcorrects 44% of examples, motivating the model
-- [ ] Step 4 — ByT5-small pilot fine-tune (FP32, 6GB VRAM config ready in
-      `configs/training/byt5_small_pilot.json`)
-- [ ] Step 5 — Full training run
-- [ ] Step 6 — Evaluation, error analysis, report
+- [x] **Step 4 — ByT5-small pilot fine-tune**: 3 epochs / 7.5h FP32 on the
+      6GB GTX 1660 Ti. CER halved vs input (0.101 → 0.050), exact match 43.8%
+      vs 12.6% identity / 8.5% SymSpell — see [reports/pilot-001.md](reports/pilot-001.md)
+- [ ] Step 5 — Inference optimisation (FP16/ONNX), confidence guard, scaled run
+- [ ] Step 6 — Hinglish stage
 
 Datasets are not committed (BEA-2019 and JFLEG/DailyDialog are
 non-commercial-licensed); re-download per `data/raw` instructions in the
