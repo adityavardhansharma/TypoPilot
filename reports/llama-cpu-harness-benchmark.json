@@ -1,0 +1,42 @@
+{
+  "date": "2026-07-16",
+  "hardware": {
+    "cpu": "AMD Ryzen 9 4900HS",
+    "cores": 8,
+    "threads": 16,
+    "instruction_set": "AVX2"
+  },
+  "runtime": {
+    "engine": "llama.cpp",
+    "commit": "e8f19cc0ad70a243c8012bf17b4be601abfc8ea2",
+    "harness": "native/src/main.cpp",
+    "threads": 16,
+    "prefix_cache": true,
+    "sampling": "greedy"
+  },
+  "model": {
+    "format": "GGUF Q4_K_M",
+    "path": "experiments/llama32-1b-lora-001/gguf/typopilot-llama32-1b-q4_k_m.gguf",
+    "size_mb": 770.3,
+    "peak_working_set_mb": 1327.1,
+    "median_load_ms": 1286,
+    "load_range_ms": [1268, 1392]
+  },
+  "method": "Median of five complete warm runs; model loaded once per run and retained for all eight inputs.",
+  "results": [
+    {"id": "paragraph",  "median_ms": 2878, "min_ms": 2714, "max_ms": 3130},
+    {"id": "sentence 1", "median_ms": 302,  "min_ms": 281,  "max_ms": 344},
+    {"id": "sentence 2", "median_ms": 347,  "min_ms": 307,  "max_ms": 399},
+    {"id": "sentence 3", "median_ms": 482,  "min_ms": 438,  "max_ms": 557},
+    {"id": "sentence 4", "median_ms": 366,  "min_ms": 332,  "max_ms": 407},
+    {"id": "sentence 5", "median_ms": 526,  "min_ms": 479,  "max_ms": 599},
+    {"id": "sentence 6", "median_ms": 468,  "min_ms": 455,  "max_ms": 903},
+    {"id": "sentence 7", "median_ms": 519,  "min_ms": 512,  "max_ms": 598}
+  ],
+  "quality": {
+    "stable_across_runs": true,
+    "sentences_correct": 7,
+    "sentences_tested": 7,
+    "paragraph_correct": true
+  }
+}

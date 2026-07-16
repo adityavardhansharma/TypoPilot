@@ -1,0 +1,12 @@
+{
+  "date": "2026-07-16",
+  "hardware": "AMD Ryzen 9 4900HS, 8 cores / 16 threads, AVX2",
+  "method": "Native CPU harness, greedy decoding, cached instruction prefix, medians of three complete runs",
+  "systems": [
+    {"name":"base_q4","fine_tuned":false,"size_mb":770.3,"load_ms":1580,"paragraph_ms":3198,"sentence_mean_ms":4590,"clean_outputs":0,"total":8,"case_medians_ms":{"paragraph":3198,"sentence_1":1259,"sentence_2":7165,"sentence_3":1052,"sentence_4":7242,"sentence_5":7084,"sentence_6":1016,"sentence_7":7310}},
+    {"name":"fine_tuned_f16","fine_tuned":true,"size_mb":2364.7,"load_ms":1410,"paragraph_ms":7541,"sentence_mean_ms":1118,"clean_outputs":7,"total":8,"case_medians_ms":{"paragraph":7541,"sentence_1":822,"sentence_2":887,"sentence_3":1246,"sentence_4":941,"sentence_5":1327,"sentence_6":1192,"sentence_7":1410}},
+    {"name":"fine_tuned_q8","fine_tuned":true,"size_mb":1259.9,"load_ms":1185,"paragraph_ms":4737,"sentence_mean_ms":696,"clean_outputs":8,"total":8,"case_medians_ms":{"paragraph":4737,"sentence_1":483,"sentence_2":566,"sentence_3":792,"sentence_4":572,"sentence_5":798,"sentence_6":770,"sentence_7":892}},
+    {"name":"fine_tuned_q4_k_m","fine_tuned":true,"size_mb":770.3,"load_ms":1383,"paragraph_ms":2934,"sentence_mean_ms":444,"clean_outputs":8,"total":8,"case_medians_ms":{"paragraph":2934,"sentence_1":318,"sentence_2":335,"sentence_3":508,"sentence_4":371,"sentence_5":518,"sentence_6":495,"sentence_7":560}}
+  ],
+  "conclusion": "Fine-tuning is essential for clean correction-only output. Q4_K_M preserves the best observed quality while minimizing size and latency."
+}
