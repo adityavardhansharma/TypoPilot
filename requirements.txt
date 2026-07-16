@@ -6,6 +6,9 @@ torch==2.7.1
 transformers==5.5.4
 accelerate>=1.1.0
 numpy
+# LLM LoRA fine-tuning (train_llm.py)
+peft>=0.13
+sentencepiece
 pyarrow==17.0.0
 symspellpy==6.10.0
 tensorboard>=2.17
