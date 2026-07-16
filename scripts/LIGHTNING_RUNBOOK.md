@@ -32,13 +32,14 @@ the unit tests.
 ## 3. Smoke test (still on the cheap machine)
 
 ```bash
+# NOTE: uses the LOCAL config — the cloud config's bf16 + batch 32 needs the L40S
 PYTHONPATH=src python -m typopilot.models.train \
-    --config configs/training/byt5_small_final_cloud.json --smoke
+    --config configs/training/byt5_small_final.json --smoke
 ```
 
-30 steps; verifies data loading, forward/backward, checkpoint save. On a
-non-bf16 machine (T4) the script warns — for the smoke test that's fine,
-add nothing; the real run must be on the L40S.
+30 steps; verifies data loading, forward/backward, checkpoint save. After
+switching to the L40S you can optionally smoke the cloud config there too
+(~2 min) before the real run.
 
 ## 4. Switch machine to L40S and run
 
