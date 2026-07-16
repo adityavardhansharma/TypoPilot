@@ -24,7 +24,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 class Corrector:
     def __init__(self, checkpoint: str, device: str | None = None,
-                 max_input_bytes: int = 192, max_new_tokens: int = 192):
+                 max_input_bytes: int = 320, max_new_tokens: int = 320):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(checkpoint)
         self.model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint).to(self.device)
