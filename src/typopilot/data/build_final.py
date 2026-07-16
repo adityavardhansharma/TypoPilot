@@ -46,7 +46,10 @@ C4_PAIRS = 30_000
 IDENTITY = 6_000
 VAL_FRACTION = 0.02
 
-MULTI_MAX_BYTES = 300           # concatenated clean text cap (training cap 320)
+MULTI_MAX_BYTES = 280           # concatenated clean text cap (training cap 320)
+# Hard cap on both sides of every pair. Anything longer would be truncated by
+# the trainer, and truncated TARGETS teach the model to drop sentence endings.
+MAX_PAIR_BYTES = 320
 
 SEVERITY_MIX = {"light": 1.0, "medium": 2.0, "heavy": 2.0, "extreme": 1.0}
 
@@ -187,6 +190,14 @@ def build(raw_dir: Path, out_dir: Path, seed: int) -> dict:
 
     for i, pair in enumerate(c4_train):
         records.append(dict(pair, id=f"c4-{i}", severity="grammar"))
+
+    def _fits(record: dict) -> bool:
+        return (len(record["input"].encode()) <= MAX_PAIR_BYTES
+                and len(record["target"].encode()) <= MAX_PAIR_BYTES)
+
+    before = len(records)
+    records = [r for r in records if _fits(r)]
+    rejections["pair_too_many_bytes"] = before - len(records)
 
     rng.shuffle(records)
     val_size = round(len(records) * VAL_FRACTION)
