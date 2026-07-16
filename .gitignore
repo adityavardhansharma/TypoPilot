@@ -8,6 +8,7 @@
 # Packaged dataset for cloud upload (build artifact; regenerate with
 # scripts/make_data_zip.ps1). Contains licensed data — do not commit.
 /data_final.zip
+/data_final_250k.zip
 
 # Python
 .venv/
