@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TypoPilot — Six-System Correction Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zilla+Slab:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#070b09; --panel:#0c120e; --edge:#18251c; --ink:#c9dccf; --dim:#65796a;
+  --green:#46e08a; --yellow:#e0b346; --red:#e05a46; --blue:#5aa9e0;
+  --purple:#c792ea; --cyan:#63d6d1; --orange:#ef9f5a; --pink:#ff72c6;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace; --display:"Zilla Slab",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:13px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9;background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 3px)}
+.wrap{max-width:1900px;margin:auto;padding:28px 24px 60px}
+header{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--edge);padding-bottom:18px;margin-bottom:18px;flex-wrap:wrap}
+h1{font-family:var(--display);font-size:28px} h1 em{color:var(--green);font-style:normal}
+.tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--bg);background:var(--green);padding:4px 9px;border-radius:3px;font-weight:600}
+.sub{color:var(--dim);font-size:12px;line-height:1.7;margin-bottom:18px;max-width:1400px}
+.legend{display:flex;gap:10px 22px;margin-bottom:22px;color:var(--dim);font-size:12px;flex-wrap:wrap}
+.mark-e,.mark-g,.mark-y,.mark-x{border-radius:3px;padding:1px 4px}.mark-e{background:rgba(224,90,70,.22);color:#f0937f}.mark-g{background:rgba(70,224,138,.18);color:var(--green)}.mark-y{background:rgba(224,179,70,.2);color:var(--yellow)}.mark-x{background:rgba(255,114,198,.18);color:var(--pink);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.summary{display:grid;grid-template-columns:repeat(6,minmax(180px,1fr));gap:1px;background:var(--edge);border:1px solid var(--edge);margin-bottom:28px}
+.scard{background:var(--panel);padding:15px 16px;border-top:2px solid var(--accent)}.scard b{display:block;color:var(--accent);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px}.score{font-size:23px;font-weight:600}.score small{font-size:12px;color:var(--dim);font-weight:400}.meta{margin-top:7px;color:var(--dim);font-size:10px;line-height:1.5}
+.case{background:var(--panel);border:1px solid var(--edge);margin-bottom:22px}.case-head{padding:11px 18px;border-bottom:1px solid var(--edge)}.case-head h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:500}
+.input-row{padding:13px 18px;line-height:1.95;border-bottom:1px dashed var(--edge)}.input-row b{display:block;color:var(--dim);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.models{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--edge)}
+.model{background:var(--panel);padding:14px 16px;min-width:0;border-top:2px solid var(--accent)}
+.mhead{display:flex;gap:8px;align-items:center;margin-bottom:10px;min-height:28px}.name{color:var(--accent);font-size:10px;letter-spacing:1.15px;text-transform:uppercase;font-weight:600}.device{color:var(--dim);font-size:8px;letter-spacing:.7px;text-transform:uppercase}.timing{margin-left:auto;color:var(--ink);font-size:11px;white-space:nowrap}.timing b{color:var(--accent)}
+.status{display:inline-block;margin-bottom:9px;border:1px solid currentColor;border-radius:10px;padding:2px 7px;font-size:9px;letter-spacing:.7px;text-transform:uppercase}.pass{color:var(--green)}.warn{color:var(--yellow)}.fail{color:var(--red)}
+.output{font-size:12.5px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere;max-height:270px;overflow:auto;padding-right:5px}.output::-webkit-scrollbar{width:5px}.output::-webkit-scrollbar-thumb{background:#294032}
+.base-card{background:#10100d}.recommended{box-shadow:inset 0 0 0 1px rgba(70,224,138,.22)}
+@media(max-width:1220px){.summary{grid-template-columns:repeat(3,1fr)}.models{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.summary,.models{grid-template-columns:1fr}.wrap{padding:18px 12px 45px}}
+</style>
+</head>
+<body><div class="wrap">
+<header><h1>Typo<em>Pilot</em> // six-system benchmark</h1><span class="tag">same paragraph + 7 sentences</span></header>
+<p class="sub">ByT5 final-002/final-003 were measured on GTX 1660 Ti. All Llama runs use the native AVX2 CPU harness on Ryzen 9 4900HS with 16 threads, greedy decoding and cached instruction prefix. Llama values are medians of three complete runs; model loading is excluded. “Clean” means the model returned only an acceptable correction—no explanation, repetition, runaway list, or meaning change.</p>
+<div class="legend"><span><span class="mark-e">error</span> in input</span><span><span class="mark-g">fixed correctly</span> by the model</span><span><span class="mark-y">still wrong</span> or wrongly changed</span><span><span class="mark-x">extra context</span> generated beyond the correction</span></div>
+<div class="summary" id="summary"></div><div id="cases"><p class="sub">Loading benchmark…</p></div>
+</div>
+<script>
+const CLEAN={
+  "paragraph":"Hey, I was checking the model results and I think the English sentences are working fine but sometimes it still changes the meaning of the text. When the paragraph gets long, the model also repeats words, misses a full line, or puts words in the wrong place. We need to check how fast it fixes the text and whether the corrected output still means the same thing. After this test we can decide if the pilot model is good enough for full training.",
+  "sentence 1":"I received your message and will reply tomorrow.",
+  "sentence 2":"Can you check if the model is working correctly?",
+  "sentence 3":"I was testing the model but it did not fix all the spelling errors.",
+  "sentence 4":"Yesterday I went to the office but nobody was there.",
+  "sentence 5":"What do you think about the results we got from the latest model test?",
+  "sentence 6":"The new update is working better but it still changes some words wrongly.",
+  "sentence 7":"I don't know why the model gave this answer because the question was completely different."
+};
+const BASE={
+  "paragraph":"hey, I was checking the model results and I think the English sentences are working fine, but sometimes they still change the meaning of the text. When the paragraph gets long, the model also repeats words, misses a full line, or puts words in the wrong place. We need to check how fast it fixes the text and whether the corrected output still means the same thing. After this test, we can decide if the pilot model is good enough for full training.",
+  "sentence 1":"I received your message and I will reply tomorrow.\n\nCorrected: I received your message and I will reply tomorrow. (Note: \"tommmorow\" is incorrect; it should be \"tomorrow\".)",
+  "sentence 2":"can you check if the model is working correctly?\n\n1. \"can\" should be \"can\" (no \"u\" in \"can\")\n2. \"chek\" should be \"check\" (spelling)\n3. \"corectly\" should be \"correctly\" (spelling)\n4. \"The\" should be \"The\" (capitalization)\n5. \"model\" should be \"model\" (no \"u\" in \"model\")\n6. \"core\" should be \"correct\" (spelling)\n7. \"che\" should be \"check\" (spelling)\n8. \"if\" should be \"if\" (no \"u\" in \"if\")\n9. \"The\" should be \"The\" (capitalization)\n10. \"model\" should be \"model\" (no \"u\" in \"model\")\n11. \"is\" should be \"is\" (no \"u\" in \"is\")\n12. \"working\" should be \"working\" (no \"u\" in \"working\")\n13. \"core\" should be \"correct\" (spelling)\n14. \"che\" should be \"check\" (spelling)\n15. \"if\" should be \"if\" (no \"u\" in",
+  "sentence 3":"I was testing the model, but it didn't fix all the spelling errors.\n\nNote: I've tried to preserve the original meaning and tone of the text while correcting the errors.",
+  "sentence 4":"Yesterday I went to the office, but nobody was there.\n\nCorrected errors:\n\n* \"to\" -> \"to\" (correct spelling)\n* \"the\" -> \"the\" (correct spelling)\n* \"office\" -> \"office\" (correct spelling)\n* \"went\" -> \"went\" (correct spelling)\n* \"but\" -> \"but\" (correct spelling)\n* \"nobody\" -> \"nobody\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\" (correct spelling)\n* \"but\" -> \"but\" (correct spelling)\n* \"nobody\" -> \"nobody\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\" (correct spelling)\n* \"there\" -> \"there\" (correct spelling)\n* \"was\" -> \"was\"",
+  "sentence 5":"What do you think about the results we got from the last model test?\n\n1. \"waht\" should be spelled as \"what\".\n2. \"yuo\" should be spelled as \"you\".\n3. \"thnik\" should be spelled as \"think\".\n4. \"abotu\" should be spelled as \"about\".\n5. \"resluts\" should be spelled as \"results\".\n6. \"we\" should be capitalized.\n7. \"latset\" should be spelled as \"latest\".\n8. \"modle\" should be spelled as \"model\".\n9. \"test\" should be spelled as \"test\".\n10. \"yuo\" should be spelled as \"you\".\n11. \"thnik\" should be spelled as \"think\".\n12. \"abotu\" should be spelled as \"about\".\n13. \"resluts\" should be spelled as \"results\".\n14. \"we\" should be capitalized.\n15. \"latset\" should be spelled as \"latest\".\n16. \"modle\" should be spelled as \"model\".\n17. \"test\" should be spelled as \"test\".\n18. \"resluts\" should be spelled as \"results\".\n19. \"yuo\" should be spelled as \"you\".\n20",
+  "sentence 6":"the new update is working better, but it still changes some words wrongly\n\nNote: I've tried to preserve the original meaning and tone of the text while correcting the errors.",
+  "sentence 7":"I don't know why the model gave this answer because the question was completely different.\n\nNote: I've corrected the following errors:\n\n* \"i\" -> \"I\"\n* \"dont\" -> \"don't\"\n* \"modle\" -> \"model\"\n* \"wer\" -> \"answer\"\n* \"quesion\" -> \"question\"\n* \"completly\" -> \"completely\"\n* \"diffrent\" -> \"different\"\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" -> \"answer\" (again, since it's the same mistake)\n* \"wer\" ->"
+};
+const F16={...CLEAN,"paragraph":CLEAN.paragraph.replace("sometimes","some times")};
+const Q8={...CLEAN};
+const Q4={...CLEAN,"sentence 6":"The new update is working better, but it still changes some words wrongly."};
+const TIMES={
+  base:{"paragraph":3198,"sentence 1":1259,"sentence 2":7165,"sentence 3":1052,"sentence 4":7242,"sentence 5":7084,"sentence 6":1016,"sentence 7":7310},
+  f16:{"paragraph":7541,"sentence 1":822,"sentence 2":887,"sentence 3":1246,"sentence 4":941,"sentence 5":1327,"sentence 6":1192,"sentence 7":1410},
+  q8:{"paragraph":4737,"sentence 1":483,"sentence 2":566,"sentence 3":792,"sentence 4":572,"sentence 5":798,"sentence 6":770,"sentence 7":892},
+  q4:{"paragraph":2934,"sentence 1":318,"sentence 2":335,"sentence 3":508,"sentence 4":371,"sentence 5":518,"sentence 6":495,"sentence 7":560}
+};
+const INFO={
+  "paragraph":{base:[false,"meaning changed"],f16:[false,"spacing remains"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 1":{base:[false,"extra output"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 2":{base:[false,"runaway 256 tokens"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 3":{base:[false,"rephrased + note"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 4":{base:[false,"runaway 256 tokens"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 5":{base:[false,"runaway 256 tokens"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 6":{base:[false,"extra output"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]},
+  "sentence 7":{base:[false,"runaway 256 tokens"],f16:[true,"clean"],q8:[true,"clean"],q4:[true,"clean"]}
+};
+const esc=s=>s.replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c]));
+const marked=tokens=>tokens.map(t=>typeof t==="string"?esc(t):`<span class="mark-${t[1]}">${esc(t[0])}</span>`).join(" ");
+const tally=tokens=>tokens.reduce((a,t)=>{if(Array.isArray(t)){if(t[1]==="g")a.g++;if(t[1]==="y")a.y++}return a},{g:0,y:0});
+const style={old:"--accent:var(--blue)",new:"--accent:var(--green)",base:"--accent:var(--orange)",f16:"--accent:var(--purple)",q8:"--accent:var(--cyan)",q4:"--accent:var(--green)"};
+const words=s=>s.trim()?s.trim().split(/\s+/):[];
+function align(a,b){
+ const n=a.length,m=b.length,dp=Array.from({length:n+1},()=>Array(m+1).fill(0));
+ for(let i=0;i<=n;i++)dp[i][0]=i;for(let j=0;j<=m;j++)dp[0][j]=j;
+ for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+ const ops=[];let i=n,j=m;
+ while(i||j){
+  if(i&&j&&dp[i][j]===dp[i-1][j-1]+(a[i-1]===b[j-1]?0:1)){ops.push({type:a[i-1]===b[j-1]?"match":"sub",ai:i-1,bj:j-1});i--;j--}
+  else if(i&&dp[i][j]===dp[i-1][j]+1){ops.push({type:"del",ai:i-1,bj:null});i--}
+  else{ops.push({type:"ins",ai:null,bj:j-1});j--}
+ }
+ return ops.reverse();
+}
+function highlighted(input,reference,generated){
+ const split=generated.indexOf("\n\n"),main=split<0?generated:generated.slice(0,split),extra=split<0?"":generated.slice(split+2);
+ const inputWords=words(input),refWords=words(reference),outWords=words(main),changed=Array(refWords.length).fill(true);
+ for(const op of align(inputWords,refWords))if(op.bj!==null)changed[op.bj]=op.type!=="match";
+ const pieces=[],missing=[];
+ for(const op of align(outWords,refWords)){
+  if(op.ai!==null){const token=esc(outWords[op.ai]);if(op.type==="match")pieces.push(changed[op.bj]?`<span class="mark-g">${token}</span>`:token);else pieces.push(`<span class="mark-y">${token}</span>`)}
+  else if(op.bj!==null)missing.push(refWords[op.bj]);
+ }
+ if(missing.length)pieces.push(`<span class="mark-y">⟨missing: ${esc(missing.join(" "))}⟩</span>`);
+ if(extra)pieces.push(`\n\n<span class="mark-x">${esc(extra)}</span>`);
+ return pieces.join(" ").replace(/ \n\n/g,"\n\n");
+}
+function llamaCard(kind,name,format,id,text,input,reference){const [pass,label]=INFO[id][kind];return `<div class="model ${kind==="base"?"base-card":""} ${kind==="q4"?"recommended":""}" style="${style[kind]}"><div class="mhead"><span class="name">${name}</span><span class="device">${format}</span><span class="timing"><b>${TIMES[kind][id]}</b>ms</span></div><span class="status ${pass?"pass":"fail"}">${pass?"pass":"fail"} · ${label}</span><div class="output">${highlighted(input,reference,text)}</div></div>`}
+function byt5Card(kind,name,tokens,ms){const t=tally(tokens);return `<div class="model" style="${style[kind]}"><div class="mhead"><span class="name">${name}</span><span class="device">ByT5 GPU</span><span class="timing"><b>${ms}</b>ms</span></div><span class="status ${t.y?"warn":"pass"}">${t.g} fixed · ${t.y} wrong</span><div class="output">${marked(tokens)}</div></div>`}
+async function load(){
+ const src=await fetch("manual-test-003-vs-002.html",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error(`base report ${r.status}`);return r.text()});
+ const m=src.match(/const DATA = (\[[\s\S]*?\n\]);\n\nconst esc/);if(!m)throw Error("could not read base comparison data");const data=Function(`"use strict";return(${m[1]})`)();
+ const cards=[
+  ["final-002","2 / 8","clean outputs","sentence avg 1027ms · paragraph 6881ms","var(--blue)"],
+  ["final-003","4 / 8","clean outputs","sentence avg 1135ms · paragraph 7188ms","var(--green)"],
+  ["base Llama Q4","0 / 8","clean outputs","sentence avg 4590ms · paragraph 3198ms · 770MB","var(--orange)"],
+  ["fine-tuned F16","7 / 8","clean outputs","sentence avg 1118ms · paragraph 7541ms · 2365MB","var(--purple)"],
+  ["fine-tuned Q8","8 / 8","clean outputs","sentence avg 696ms · paragraph 4737ms · 1260MB","var(--cyan)"],
+  ["fine-tuned Q4","8 / 8","clean outputs","sentence avg 444ms · paragraph 2934ms · 770MB · recommended","var(--green)"]];
+ document.getElementById("summary").innerHTML=cards.map(c=>`<div class="scard" style="--accent:${c[4]}"><b>${c[0]}</b><div class="score">${c[1]} <small>${c[2]}</small></div><div class="meta">${c[3]}</div></div>`).join("");
+ document.getElementById("cases").innerHTML=data.map(d=>{const input=d.input.map(t=>Array.isArray(t)?t[0]:t).join(" ");return `<section class="case"><div class="case-head"><h2>${d.id}</h2></div><div class="input-row"><b>you gave</b>${marked(d.input)}</div><div class="models">${byt5Card("old","final-002",d.old,d.old_lat)}${byt5Card("new","final-003",d.new,d.new_lat)}${llamaCard("base","base Llama","Q4 CPU",d.id,BASE[d.id],input,CLEAN[d.id])}${llamaCard("f16","fine-tuned Llama","F16 CPU",d.id,F16[d.id],input,CLEAN[d.id])}${llamaCard("q8","fine-tuned Llama","Q8 CPU",d.id,Q8[d.id],input,CLEAN[d.id])}${llamaCard("q4","fine-tuned Llama","Q4 CPU",d.id,Q4[d.id],input,Q4[d.id])}</div></section>`}).join("");
+}
+load().catch(e=>document.getElementById("cases").innerHTML=`<p class="sub" style="color:var(--red)">${esc(e.message)}</p>`);
+</script></body></html>

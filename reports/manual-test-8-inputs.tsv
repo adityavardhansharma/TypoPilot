@@ -1,0 +1,8 @@
+paragraph	hey i was cheking teh modle resluts and i thnik the eng lish sentnces are working fine but some times it still changes the mean ing of the text. when the para gets long the modle also repetes words, miss es a full line, or puts words in the rong place. we need to chek how fasst it fixes the text and whether the corected output still means teh same thing. after this test we cna decied if the pilot model is gud enogh for full train ing.
+sentence 1	I recieved your mesage and will reply tommorow.
+sentence 2	can you chek if The model is working corectly?
+sentence 3	I was test ing the model but it did not fixall the spelling erors.
+sentence 4	Yesterday I to the office went but nobody there was.
+sentence 5	waht do yuo thnik abotu the resluts we got form the latset modle test
+sentence 6	the new upd ate is work ing better but it still changs some words rongly
+sentence 7	i dont know why the modle gave this ans wer because the ques tion was completly diffrent
