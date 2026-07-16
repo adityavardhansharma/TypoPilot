@@ -8,120 +8,79 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zilla+Slab:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #070b09;
-    --panel: #0c120e;
-    --panel-edge: #16211a;
-    --ink: #c9dccf;
-    --ink-dim: #5d7263;
-    --phosphor: #46e08a;
-    --phosphor-soft: rgba(70, 224, 138, .12);
-    --amber: #e0b346;
-    --red: #e05a46;
+    --bg: #070b09; --panel: #0c120e; --panel-2: #0f1712; --panel-edge: #16211a;
+    --ink: #c9dccf; --ink-dim: #5d7263;
+    --phosphor: #46e08a; --phosphor-soft: rgba(70,224,138,.12);
+    --amber: #e0b346; --red: #e05a46; --blue: #5aa9e0;
     --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
     --display: "Zilla Slab", Georgia, serif;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--mono);
-    font-size: 14px;
-    overflow-x: hidden;
-  }
-  /* faint scanlines + vignette atmosphere */
+  body { background: var(--bg); color: var(--ink); font-family: var(--mono); font-size: 14px; overflow-x: hidden; }
   body::before {
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9;
     background:
-      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px),
-      radial-gradient(ellipse at 50% 0%, transparent 55%, rgba(0,0,0,.5) 100%);
+      repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 50% -10%, transparent 55%, rgba(0,0,0,.55) 100%);
   }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 26px 24px 60px; }
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 60px; }
-
-  header {
-    display: flex; align-items: baseline; gap: 18px;
-    border-bottom: 1px solid var(--panel-edge); padding-bottom: 18px; margin-bottom: 26px;
-  }
-  header h1 {
-    font-family: var(--display); font-size: 30px; font-weight: 700;
-    color: var(--ink); letter-spacing: .5px;
-  }
+  header { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--panel-edge); padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  header h1 { font-family: var(--display); font-size: 28px; font-weight: 700; letter-spacing: .5px; }
   header h1 em { color: var(--phosphor); font-style: normal; }
   .experiment { color: var(--ink-dim); font-size: 13px; }
-  .status {
-    margin-left: auto; padding: 5px 14px; border-radius: 3px;
-    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
-    border: 1px solid var(--panel-edge); color: var(--ink-dim);
-  }
-  .status.training { color: var(--phosphor); border-color: var(--phosphor); animation: pulse 2.2s infinite; }
-  .status.completed { color: var(--amber); border-color: var(--amber); }
-  .status.failed, .status.stale { color: var(--red); border-color: var(--red); }
-  @keyframes pulse { 50% { opacity: .45; } }
+  .status { margin-left: auto; padding: 5px 15px; border-radius: 3px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--panel-edge); color: var(--ink-dim); display: flex; align-items: center; gap: 8px; }
+  .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .status.training { color: var(--phosphor); border-color: rgba(70,224,138,.4); }
+  .status.training::before { animation: pulse 1.4s infinite; }
+  .status.completed { color: var(--amber); border-color: rgba(224,179,70,.4); }
+  .status.failed, .status.stale { color: var(--red); border-color: rgba(224,90,70,.4); }
+  @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; } 50% { opacity: .4; } }
 
-  /* hero percentage */
-  .hero { display: grid; grid-template-columns: minmax(280px, 1fr) 2fr; gap: 26px; margin-bottom: 26px; }
-  .pct-panel {
-    background: var(--panel); border: 1px solid var(--panel-edge);
-    padding: 26px 30px; position: relative; overflow: hidden;
-  }
-  .pct-panel::after {
-    content: ""; position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 20%, var(--phosphor-soft), transparent 60%);
-    pointer-events: none;
-  }
-  .pct {
-    font-size: clamp(64px, 9vw, 108px); font-weight: 600; line-height: 1;
-    color: var(--phosphor); text-shadow: 0 0 24px rgba(70,224,138,.35);
-    font-variant-numeric: tabular-nums;
-  }
-  .pct small { font-size: .35em; color: var(--ink-dim); }
-  .bar {
-    margin-top: 20px; height: 10px; background: #111a14;
-    border: 1px solid var(--panel-edge); position: relative;
-  }
-  .bar > i {
-    display: block; height: 100%; width: 0%;
-    background: linear-gradient(90deg, #1d7a4b, var(--phosphor));
-    box-shadow: 0 0 12px rgba(70,224,138,.5);
-    transition: width .6s ease;
-  }
-  .under-bar { margin-top: 12px; display: flex; justify-content: space-between; color: var(--ink-dim); font-size: 12px; }
+  /* hero: progress ring + stat grid */
+  .hero { display: grid; grid-template-columns: 260px 1fr; gap: 22px; margin-bottom: 22px; align-items: stretch; }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
+  .ring-card { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 4px; padding: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .ring-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, var(--phosphor-soft), transparent 65%); pointer-events: none; }
+  .ring-wrap { position: relative; width: 190px; height: 190px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-pct { font-size: 46px; font-weight: 600; color: var(--phosphor); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgba(70,224,138,.35); }
+  .ring-pct small { font-size: .4em; color: var(--ink-dim); }
+  .ring-sub { margin-top: 6px; font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+  .ring-eta { margin-top: 12px; font-size: 12px; color: var(--ink); }
+  .ring-eta b { color: var(--amber); }
 
-  /* stat grid */
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--panel-edge); border: 1px solid var(--panel-edge); }
-  .stat { background: var(--panel); padding: 16px 18px; }
-  .stat b { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 8px; font-weight: 500; }
-  .stat span { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .stat .accent { color: var(--phosphor); }
-  .stat .amber { color: var(--amber); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--panel-edge); border: 1px solid var(--panel-edge); border-radius: 4px; overflow: hidden; }
+  @media (max-width: 620px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: var(--panel); padding: 14px 16px; transition: background .2s; }
+  .stat:hover { background: var(--panel-2); }
+  .stat b { display: block; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 7px; font-weight: 500; }
+  .stat span { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat .delta { font-size: 12px; margin-left: 6px; font-weight: 500; }
+  .stat .down { color: var(--phosphor); } .stat .up { color: var(--red); }
+  .accent { color: var(--phosphor); } .amberc { color: var(--amber); }
 
   /* chart + log */
-  .panels { display: grid; grid-template-columns: 3fr 2fr; gap: 26px; margin-top: 26px; }
-  @media (max-width: 900px) { .panels, .hero { grid-template-columns: 1fr; } }
-  section {
-    background: var(--panel); border: 1px solid var(--panel-edge); padding: 18px;
-  }
-  section h2 {
-    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--ink-dim); font-weight: 500; margin-bottom: 14px;
-    display: flex; gap: 12px; align-items: center;
-  }
-  section h2::after { content: ""; flex: 1; height: 1px; background: var(--panel-edge); }
-  canvas { width: 100%; height: 260px; display: block; }
-  .legend { display: flex; gap: 18px; margin-top: 10px; font-size: 12px; color: var(--ink-dim); }
-  .key { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 6px; }
+  .panels { display: grid; grid-template-columns: 1.7fr 1fr; gap: 22px; }
+  @media (max-width: 900px) { .panels { grid-template-columns: 1fr; } }
+  section { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 4px; padding: 16px 18px; }
+  section h2 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-dim); font-weight: 500; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
+  section h2 .legend-in { display: inline-flex; gap: 14px; margin-left: auto; letter-spacing: 0; text-transform: none; font-size: 11.5px; }
+  .key { display: inline-block; width: 16px; height: 3px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+  .chart-wrap { position: relative; }
+  canvas { width: 100%; height: 300px; display: block; cursor: crosshair; }
+  .tooltip { position: absolute; pointer-events: none; background: rgba(7,11,9,.96); border: 1px solid var(--panel-edge); border-radius: 4px; padding: 8px 11px; font-size: 12px; line-height: 1.6; z-index: 5; opacity: 0; transition: opacity .1s; white-space: nowrap; box-shadow: 0 6px 20px rgba(0,0,0,.5); }
+  .tooltip .t-step { color: var(--ink-dim); margin-bottom: 3px; }
+  .tooltip .t-row { display: flex; gap: 10px; justify-content: space-between; }
+  .tooltip .t-row b { font-weight: 600; }
 
-  .log {
-    height: 276px; overflow-y: auto; font-size: 12.5px; line-height: 1.75;
-    color: var(--ink); scrollbar-width: thin; scrollbar-color: var(--panel-edge) transparent;
-  }
-  .log div { white-space: pre-wrap; }
-  .log .eval { color: var(--amber); }
-  .log .ckpt { color: var(--phosphor); }
-  .log .fail { color: var(--red); }
+  .log { height: 318px; overflow-y: auto; font-size: 12.5px; line-height: 1.7; scrollbar-width: thin; scrollbar-color: var(--panel-edge) transparent; }
+  .log div { white-space: pre-wrap; padding: 1px 0; }
+  .log .eval { color: var(--amber); } .log .ckpt { color: var(--phosphor); } .log .fail { color: var(--red); }
 
-  .footer-note { margin-top: 26px; color: var(--ink-dim); font-size: 12px; }
+  .footer-note { margin-top: 22px; color: var(--ink-dim); font-size: 12px; }
   .footer-note code { color: var(--ink); }
 </style>
 </head>
@@ -134,20 +93,31 @@
   </header>
 
   <div class="hero">
-    <div class="pct-panel">
-      <div class="pct"><span id="pct">0.00</span><small> %</small></div>
-      <div class="bar"><i id="bar"></i></div>
-      <div class="under-bar">
-        <span id="stepline">step 0 / 0</span>
-        <span id="epochline">epoch 0 / 0</span>
+    <div class="ring-card">
+      <div class="ring-wrap">
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <circle cx="95" cy="95" r="84" fill="none" stroke="#111a14" stroke-width="12"/>
+          <circle id="ring" cx="95" cy="95" r="84" fill="none" stroke="url(#grad)" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="527.8" stroke-dashoffset="527.8"
+                  style="transition: stroke-dashoffset .6s ease; filter: drop-shadow(0 0 6px rgba(70,224,138,.5));"/>
+          <defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1d7a4b"/><stop offset="1" stop-color="#46e08a"/>
+          </linearGradient></defs>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct"><span id="pct">0.0</span><small>%</small></div>
+          <div class="ring-sub" id="stepline">step 0 / 0</div>
+        </div>
       </div>
+      <div class="ring-eta">ETA <b id="eta">—</b> · <span id="epochline">epoch 0 / 0</span></div>
     </div>
+
     <div class="stats">
-      <div class="stat"><b>Train loss</b><span class="accent" id="loss">—</span></div>
-      <div class="stat"><b>Eval loss</b><span class="amber" id="eval_loss">—</span></div>
-      <div class="stat"><b>ETA</b><span id="eta">—</span></div>
-      <div class="stat"><b>Elapsed</b><span id="elapsed">—</span></div>
+      <div class="stat"><b>Train loss</b><span class="accent" id="loss">—</span><span class="delta" id="loss-d"></span></div>
+      <div class="stat"><b>Eval loss</b><span class="amberc" id="eval_loss">—</span><span class="delta" id="eval-d"></span></div>
+      <div class="stat"><b>Best eval</b><span id="best_eval">—</span></div>
       <div class="stat"><b>Steps / sec</b><span id="sps">—</span></div>
+      <div class="stat"><b>Elapsed</b><span id="elapsed">—</span></div>
       <div class="stat"><b>Learning rate</b><span id="lr">—</span></div>
       <div class="stat"><b>Peak VRAM</b><span id="vram">—</span></div>
       <div class="stat"><b>Last update</b><span id="updated">—</span></div>
@@ -156,11 +126,15 @@
 
   <div class="panels">
     <section>
-      <h2>Loss</h2>
-      <canvas id="chart" width="640" height="260"></canvas>
-      <div class="legend">
-        <span><i class="key" style="background:var(--phosphor)"></i>train</span>
-        <span><i class="key" style="background:var(--amber)"></i>eval</span>
+      <h2>Loss
+        <span class="legend-in">
+          <span><i class="key" style="background:var(--phosphor)"></i>train</span>
+          <span><i class="key" style="background:var(--amber)"></i>eval</span>
+        </span>
+      </h2>
+      <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+        <div class="tooltip" id="tooltip"></div>
       </div>
     </section>
     <section>
@@ -169,9 +143,7 @@
     </section>
   </div>
 
-  <p class="footer-note">
-    polling <code id="src">progress.json</code> every 2s — refresh-free; leave this tab open while the run cooks.
-  </p>
+  <p class="footer-note">polling <code id="src">progress.json</code> every 2s · hover the chart for exact values</p>
 </div>
 
 <script>
@@ -179,65 +151,133 @@ const params = new URLSearchParams(location.search);
 const run = params.get("run") || "byt5-small-pilot-001";
 const SRC = `/experiments/${run}/progress.json`;
 document.getElementById("src").textContent = SRC;
-
 const $ = id => document.getElementById(id);
 
-function fmtDuration(s) {
+function fmtDur(s) {
   if (s == null) return "—";
   s = Math.max(0, Math.round(s));
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
   return h ? `${h}h ${String(m).padStart(2,"0")}m` : m ? `${m}m ${String(sec).padStart(2,"0")}s` : `${sec}s`;
 }
+function smooth(points, win) {
+  if (points.length < 3) return points.slice();
+  const out = [];
+  for (let i = 0; i < points.length; i++) {
+    const a = Math.max(0, i - win), b = Math.min(points.length - 1, i + win);
+    let s = 0; for (let j = a; j <= b; j++) s += points[j][1];
+    out.push([points[i][0], s / (b - a + 1)]);
+  }
+  return out;
+}
 
-function drawChart(train, evals) {
-  const canvas = $("chart");
+// ---- interactive chart ----
+const canvas = $("chart"), tip = $("tooltip");
+let CH = { train: [], evals: [], map: null, hover: null };
+
+function renderChart() {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth, h = canvas.clientHeight;
   canvas.width = w * dpr; canvas.height = h * dpr;
   const ctx = canvas.getContext("2d");
-  ctx.scale(dpr, dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
-  if (!train.length) return;
+  const train = CH.train, evals = CH.evals;
+  if (!train.length) { CH.map = null; return; }
 
-  const pad = { l: 46, r: 10, t: 10, b: 22 };
+  const pad = { l: 50, r: 12, t: 12, b: 26 };
   const xs = train.map(p => p[0]).concat(evals.map(p => p[0]));
   const ys = train.map(p => p[1]).concat(evals.map(p => p[1]));
-  const xMax = Math.max(...xs), xMin = 0;
+  const xMax = Math.max(...xs, 1), xMin = 0;
   let yMin = Math.min(...ys), yMax = Math.max(...ys);
   if (yMax === yMin) { yMax += 0.1; yMin -= 0.1; }
-  const yPad = (yMax - yMin) * 0.08; yMin -= yPad; yMax += yPad;
-
+  const yPad = (yMax - yMin) * 0.1; yMin = Math.max(0, yMin - yPad); yMax += yPad;
   const X = x => pad.l + (x - xMin) / (xMax - xMin || 1) * (w - pad.l - pad.r);
   const Y = y => h - pad.b - (y - yMin) / (yMax - yMin) * (h - pad.t - pad.b);
+  CH.map = { X, Y, xMin, xMax, yMin, yMax, pad, w, h };
 
+  // gridlines + y labels
   ctx.strokeStyle = "#16211a"; ctx.fillStyle = "#5d7263";
   ctx.font = "10px IBM Plex Mono, monospace"; ctx.lineWidth = 1;
   for (let g = 0; g <= 4; g++) {
     const yVal = yMin + (yMax - yMin) * g / 4, y = Y(yVal);
     ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
-    ctx.fillText(yVal.toFixed(2), 6, y + 3);
+    ctx.fillText(yVal.toFixed(3), 6, y + 3);
   }
-  ctx.fillText("0", pad.l, h - 8);
-  ctx.fillText(String(xMax), w - pad.r - 30, h - 8);
+  ctx.fillText("0", pad.l, h - 9);
+  ctx.fillText(xMax.toLocaleString(), w - pad.r - 42, h - 9);
 
-  function line(points, color, glow) {
-    if (!points.length) return;
-    ctx.strokeStyle = color; ctx.lineWidth = 1.8;
-    ctx.shadowColor = glow; ctx.shadowBlur = 6;
+  // area fill under smoothed train
+  const strain = smooth(train, 4);
+  ctx.beginPath();
+  strain.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])));
+  ctx.lineTo(X(strain[strain.length-1][0]), Y(yMin));
+  ctx.lineTo(X(strain[0][0]), Y(yMin)); ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.t, 0, h - pad.b);
+  grad.addColorStop(0, "rgba(70,224,138,.16)"); grad.addColorStop(1, "rgba(70,224,138,0)");
+  ctx.fillStyle = grad; ctx.fill();
+
+  // raw train (faint) + smoothed train (bright)
+  function line(points, color, width, glow, alpha) {
+    if (points.length < 2) return;
+    ctx.globalAlpha = alpha == null ? 1 : alpha;
+    ctx.strokeStyle = color; ctx.lineWidth = width;
+    ctx.shadowColor = glow || "transparent"; ctx.shadowBlur = glow ? 6 : 0;
     ctx.beginPath();
     points.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])));
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
-  line(train, "#46e08a", "rgba(70,224,138,.6)");
-  line(evals, "#e0b346", "rgba(224,179,70,.6)");
-  evals.forEach(p => {
-    ctx.fillStyle = "#e0b346";
-    ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 3, 0, Math.PI * 2); ctx.fill();
-  });
+  line(train, "#46e08a", 1, null, .22);
+  line(strain, "#46e08a", 1.9, "rgba(70,224,138,.55)");
+  line(evals, "#e0b346", 1.9, "rgba(224,179,70,.5)");
+  evals.forEach(p => { ctx.fillStyle = "#e0b346"; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 3, 0, 7); ctx.fill(); });
+
+  // hover crosshair + markers
+  if (CH.hover != null) {
+    const hx = X(CH.hover.step);
+    ctx.strokeStyle = "rgba(201,220,207,.25)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(hx, pad.t); ctx.lineTo(hx, h - pad.b); ctx.stroke();
+    if (CH.hover.train != null) { ctx.fillStyle = "#46e08a"; ctx.beginPath(); ctx.arc(hx, Y(CH.hover.train), 4, 0, 7); ctx.fill(); }
+    if (CH.hover.evalv != null) { ctx.fillStyle = "#e0b346"; ctx.beginPath(); ctx.arc(hx, Y(CH.hover.evalv), 4.5, 0, 7); ctx.fill(); }
+  }
 }
 
-let lastLogLength = -1;
+function nearest(points, step) {
+  if (!points.length) return null;
+  let best = points[0];
+  for (const p of points) if (Math.abs(p[0] - step) < Math.abs(best[0] - step)) best = p;
+  return best;
+}
+canvas.addEventListener("mousemove", e => {
+  if (!CH.map) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const { X, xMin, xMax, pad, w } = CH.map;
+  const frac = (mx - pad.l) / (w - pad.l - pad.r);
+  const step = xMin + frac * (xMax - xMin);
+  const t = nearest(CH.train, step), ev = nearest(CH.evals, step);
+  const anchor = t || ev; if (!anchor) return;
+  CH.hover = { step: anchor[0], train: t ? t[1] : null, evalv: ev ? ev[1] : null };
+  renderChart();
+  tip.style.opacity = 1;
+  tip.innerHTML = `<div class="t-step">step ${anchor[0].toLocaleString()}</div>`
+    + (t ? `<div class="t-row"><span style="color:var(--phosphor)">train</span><b>${t[1].toFixed(4)}</b></div>` : "")
+    + (ev ? `<div class="t-row"><span style="color:var(--amber)">eval</span><b>${ev[1].toFixed(4)}</b></div>` : "");
+  const tw = tip.offsetWidth, px = X(anchor[0]);
+  tip.style.left = Math.min(w - tw - 6, Math.max(6, px + 12)) + "px";
+  tip.style.top = "14px";
+});
+canvas.addEventListener("mouseleave", () => { CH.hover = null; tip.style.opacity = 0; renderChart(); });
+window.addEventListener("resize", renderChart);
+
+let lastLogLen = -1, prevLoss = null, prevEval = null;
+function setDelta(el, cur, prev) {
+  if (prev == null || cur == null) { el.textContent = ""; return; }
+  const d = cur - prev;
+  if (Math.abs(d) < 1e-6) { el.textContent = ""; return; }
+  el.textContent = (d < 0 ? "▼" : "▲") + Math.abs(d).toFixed(3);
+  el.className = "delta " + (d < 0 ? "down" : "up");
+}
+
 async function poll() {
   try {
     const res = await fetch(SRC + "?t=" + Date.now(), { cache: "no-store" });
@@ -245,43 +285,47 @@ async function poll() {
     const s = await res.json();
 
     $("experiment").textContent = s.experiment || run;
-    $("pct").textContent = (s.percent ?? 0).toFixed(2);
-    $("bar").style.width = (s.percent ?? 0) + "%";
-    $("stepline").textContent = `step ${s.global_step} / ${s.max_steps}`;
-    $("epochline").textContent = `epoch ${s.epoch} / ${s.num_epochs}`;
+    const pct = s.percent ?? 0;
+    $("pct").textContent = pct.toFixed(1);
+    $("ring").style.strokeDashoffset = (527.8 * (1 - pct / 100)).toFixed(1);
+    $("stepline").textContent = `step ${(s.global_step||0).toLocaleString()} / ${(s.max_steps||0).toLocaleString()}`;
+    $("epochline").textContent = `epoch ${s.epoch ?? 0} / ${s.num_epochs ?? 0}`;
+    $("eta").textContent = fmtDur(s.eta_seconds);
+
+    setDelta($("loss-d"), s.loss, prevLoss); prevLoss = s.loss;
+    setDelta($("eval-d"), s.eval_loss, prevEval); prevEval = s.eval_loss;
     $("loss").textContent = s.loss != null ? s.loss.toFixed(4) : "—";
     $("eval_loss").textContent = s.eval_loss != null ? s.eval_loss.toFixed(4) : "—";
-    $("eta").textContent = fmtDuration(s.eta_seconds);
-    $("elapsed").textContent = fmtDuration(s.elapsed_seconds);
+    const evs = s.eval_history || [];
+    $("best_eval").textContent = evs.length ? Math.min(...evs.map(e => e[1])).toFixed(4) : "—";
     $("sps").textContent = s.steps_per_second != null ? s.steps_per_second.toFixed(2) : "—";
+    $("elapsed").textContent = fmtDur(s.elapsed_seconds);
     $("lr").textContent = s.learning_rate != null ? s.learning_rate.toExponential(1) : "—";
     $("vram").textContent = s.peak_vram_gb != null ? s.peak_vram_gb + " GB" : "—";
-
-    const age = s.updated_at ? (Date.now() / 1000 - s.updated_at) : null;
+    const age = s.updated_at ? (Date.now()/1000 - s.updated_at) : null;
     $("updated").textContent = age != null ? Math.round(age) + "s ago" : "—";
 
     const el = $("status");
-    let status = s.status || "unknown";
-    if (status === "training" && age != null && age > 300) status = "stale";
-    el.textContent = status; el.className = "status " + status;
+    let st = s.status || "unknown";
+    if (st === "training" && age != null && age > 300) st = "stale";
+    el.textContent = st; el.className = "status " + st;
 
-    drawChart(s.loss_history || [], s.eval_history || []);
+    CH.train = s.loss_history || []; CH.evals = s.eval_history || [];
+    if (CH.hover == null) renderChart();
 
     const lines = s.log_lines || [];
-    if (lines.length !== lastLogLength) {
-      lastLogLength = lines.length;
+    if (lines.length !== lastLogLen) {
+      lastLogLen = lines.length;
       const log = $("log");
       log.innerHTML = lines.map(l => {
-        const cls = l.includes("eval") ? "eval" : l.includes("checkpoint") ? "ckpt"
-                  : l.includes("failed") ? "fail" : "";
-        return `<div class="${cls}"></div>`;
+        const c = l.includes("eval") ? "eval" : l.includes("checkpoint") ? "ckpt" : l.includes("failed") ? "fail" : "";
+        return `<div class="${c}"></div>`;
       }).join("");
       [...log.children].forEach((d, i) => d.textContent = lines[i]);
       log.scrollTop = log.scrollHeight;
     }
   } catch (e) {
-    $("status").textContent = "waiting for run";
-    $("status").className = "status";
+    $("status").textContent = "waiting for run"; $("status").className = "status";
   }
 }
 poll();
