@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="TypoPilot is a compact local model for correcting heavily mistyped English with sentence context.">
+  <meta name="theme-color" content="#f4f6f0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>TypoPilot — Type fast. We’ll read through it.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Geologica:slnt,wght@-4..0,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header" data-header>
+    <a class="brand" href="index.html" aria-label="TypoPilot home">
+      <span class="brand-mark" aria-hidden="true">✦</span>
+      <span>TypoPilot</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span>Menu</span><i aria-hidden="true"></i>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="#how-it-works">How it works</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="research.html">Research</a>
+      <a class="nav-cta" href="https://github.com/adityavardhansharma/TypoPilot">View source <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="status-line"><span></span> Model research in active development</p>
+        <h1 id="hero-title">Autocorrect for the mistakes autocorrect can’t read.</h1>
+        <p class="hero-lede">TypoPilot uses sentence context to recover heavily mistyped English—locally, privately, and at useful laptop-CPU speed.</p>
+        <div class="hero-actions">
+          <a class="button button-dark" href="research.html">Read the research <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="#benchmarks">Explore benchmarks <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+
+      <div class="flight-board" data-flight-board aria-label="Animated example: TypoPilot corrects a heavily mistyped sentence as an aircraft passes over it">
+        <div class="flight-board-top">
+          <span>Correction route</span>
+          <span class="route-code">TP / LOCAL / 001</span>
+        </div>
+        <div class="flight-stage">
+          <div class="flight-grid" aria-hidden="true"></div>
+          <span class="stage-label stage-label-before">Uncorrected</span>
+          <span class="stage-label stage-label-after">Corrected</span>
+          <div class="sentence-stack" aria-hidden="true">
+            <p class="flight-sentence sentence-wrong" data-wrong>Lest keeP looknig.</p>
+            <p class="flight-sentence sentence-correct" data-correct>Let's keep looking.</p>
+          </div>
+          <div class="plane-track" aria-hidden="true">
+            <span class="plane-wake"></span>
+            <svg class="plane" viewBox="0 0 80 80" role="img" aria-label="">
+              <path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flight-board-bottom">
+          <span><i class="signal-dot"></i> On-device pass</span>
+          <span data-example-count>Example 1 / 4</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof-rail" aria-label="Selected evaluation results">
+      <div class="shell proof-rail-inner">
+        <div><strong>83.23%</strong><span>exact spelling accuracy</span></div>
+        <div><strong>83.4%</strong><span>relative CER reduction</span></div>
+        <div><strong>344 ms</strong><span>average short-input CPU time</span></div>
+        <div><strong>98.02%</strong><span>clean-text preservation</span></div>
+      </div>
+      <p class="metric-scope shell">650-example spelling subset and Ryzen 9 4900HS CPU measurements. <a href="research.html#methodology">Read the methodology</a>.</p>
+    </section>
+
+    <section class="section shell" id="how-it-works" aria-labelledby="damage-title">
+      <div class="section-intro split-intro">
+        <h2 id="damage-title">Built for the sentence after the typo.</h2>
+        <p>Conventional checkers often solve one word at a time. TypoPilot reads the damage as a sentence, then makes the smallest correction it can justify.</p>
+      </div>
+      <div class="correction-ledger">
+        <article class="correction-row">
+          <div class="row-index" aria-hidden="true">→</div>
+          <div class="row-kind">Heavy keyboard damage</div>
+          <div class="row-example">
+            <p class="before"><span>Input</span> Itt sounnds sounnds dangerous.</p>
+            <p class="after"><span>Output</span> It sounds dangerous.</p>
+          </div>
+        </article>
+        <article class="correction-row">
+          <div class="row-index" aria-hidden="true">→</div>
+          <div class="row-kind">Merged words</div>
+          <div class="row-example">
+            <p class="before"><span>Input</span> I'll c to hte arrenemenst for tjhe pa rty.</p>
+            <p class="after"><span>Output</span> I'll see to the arrangements for the party.</p>
+          </div>
+        </article>
+        <article class="correction-row">
+          <div class="row-index" aria-hidden="true">→</div>
+          <div class="row-kind">Meaning from context</div>
+          <div class="row-example">
+            <p class="before"><span>Input</span> luck turNed inmytaVor.</p>
+            <p class="after"><span>Output</span> Luck turned in my favor.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-tint" id="benchmarks" aria-labelledby="speed-title">
+      <div class="shell">
+        <div class="section-intro benchmark-intro">
+          <div>
+            <p class="claim-tag">Same model · same eight inputs · same CPU</p>
+            <h2 id="speed-title">The fastest fine-tuned variant kept every clean output.</h2>
+          </div>
+          <p>Quantising to Q4_K_M cut sentence latency and model size without losing a correct output in the manual comparison.</p>
+        </div>
+
+        <div class="benchmark-layout">
+          <div class="rank-callout">
+            <span class="rank-number">#1</span>
+            <p>for latency among the three fine-tuned variants tested</p>
+            <strong>444 ms</strong>
+            <small>mean across seven sentences</small>
+          </div>
+          <div class="bar-chart" role="img" aria-label="Mean sentence latency: Q4_K_M 444 milliseconds, Q8 696 milliseconds, F16 1118 milliseconds">
+            <div class="chart-axis"><span>0 ms</span><span>1,200 ms</span></div>
+            <div class="bar-row winner">
+              <span class="bar-rank">1</span><span class="bar-name">Q4_K_M</span>
+              <span class="bar-track"><i style="--bar:39.7%"></i></span><strong>444</strong>
+            </div>
+            <div class="bar-row">
+              <span class="bar-rank">2</span><span class="bar-name">Q8</span>
+              <span class="bar-track"><i style="--bar:62.3%"></i></span><strong>696</strong>
+            </div>
+            <div class="bar-row">
+              <span class="bar-rank">3</span><span class="bar-name">F16</span>
+              <span class="bar-track"><i style="--bar:100%"></i></span><strong>1,118</strong>
+            </div>
+            <p class="chart-note">Milliseconds, lower is better. Medians of three complete native CPU runs.</p>
+          </div>
+        </div>
+
+        <div class="benchmark-facts">
+          <div><span>Model size</span><strong>770.3 MB</strong><small>67% smaller than F16</small></div>
+          <div><span>Clean outputs</span><strong>8 / 8</strong><small>sentences + paragraph</small></div>
+          <div><span>Peak memory</span><strong>1.30 GB</strong><small>native working set</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell evidence-section" aria-labelledby="evidence-title">
+      <div class="evidence-copy">
+        <p class="claim-tag">The complete 900-example suite</p>
+        <h2 id="evidence-title">Not a highlight reel. Every output is inspectable.</h2>
+        <p>The final model improved 687 inputs, exactly matched 629 references, and preserved 99 of 101 unchanged examples. The full report includes successes, misses, and overcorrections.</p>
+        <a class="button button-outline" href="../reports/llama-q4-900-eval-annotated.html">Inspect all 900 outputs <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="dot-evidence" role="img" aria-label="A field of 900 dots representing mutually exclusive evaluation outcomes: 629 exact, 157 improved but not exact, 72 overcorrected, and 42 other outcomes">
+        <div class="dot-legend">
+          <span><i class="dot exact"></i>629 exact</span>
+          <span><i class="dot improved"></i>157 improved, not exact</span>
+          <span><i class="dot over"></i>72 overcorrected</span>
+          <span><i class="dot neutral"></i>42 other</span>
+        </div>
+        <div class="dot-matrix" data-dot-matrix aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="section local-section" aria-labelledby="local-title">
+      <div class="shell local-layout">
+        <div class="local-visual" aria-hidden="true">
+          <div class="local-node input-node">Your text</div>
+          <div class="local-route"><span class="route-plane">✦</span></div>
+          <div class="local-node model-node">770 MB model</div>
+          <p>Nothing leaves the machine.</p>
+        </div>
+        <div class="local-copy">
+          <p class="claim-tag">Local by design</p>
+          <h2 id="local-title">Context without the cloud round-trip.</h2>
+          <p>The final model runs through a native llama.cpp harness on an ordinary eight-core laptop CPU. Keeping the model loaded turns correction into a sub-second interaction for typical sentences.</p>
+          <dl class="spec-list">
+            <div><dt>Runtime</dt><dd>Native C++ · AVX2 · 16 threads</dd></div>
+            <div><dt>Format</dt><dd>GGUF · Q4_K_M</dd></div>
+            <div><dt>Median load</dt><dd>1.29 seconds</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell research-teaser" aria-labelledby="research-title">
+      <div>
+        <p class="claim-tag">Research, designed to be read</p>
+        <h2 id="research-title">Every model. Every trade-off. Every limitation.</h2>
+      </div>
+      <div class="research-route">
+        <p>Follow the project from rule-based baselines through ByT5 experiments to the final fine-tuned and quantised Llama model.</p>
+        <a class="button button-dark" href="research.html">Open the Research page <span aria-hidden="true">↗</span></a>
+      </div>
+      <ol class="model-lineage" aria-label="Model research timeline">
+        <li><span>Baseline</span><strong>Rules + SymSpell</strong><small>44% overcorrection exposed the gap.</small></li>
+        <li><span>Byte-level</span><strong>ByT5-small</strong><small>Promising spelling, inconsistent grammar.</small></li>
+        <li><span>Contextual</span><strong>Llama 3.2 1B + LoRA</strong><small>Correction-only behaviour learned.</small></li>
+        <li><span>Final runtime</span><strong>Q4_K_M</strong><small>Best measured quality–speed balance.</small></li>
+      </ol>
+    </section>
+
+    <section class="closing-cta shell" aria-labelledby="closing-title">
+      <div class="closing-dots" aria-hidden="true"></div>
+      <p>TypoPilot</p>
+      <h2 id="closing-title">Type fast.<br>We’ll read through it.</h2>
+      <a href="research.html">Read how the model was built <span aria-hidden="true">→</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">✦</span><span>TypoPilot</span></a>
+    <p>A local noisy-text correction research project.</p>
+    <nav aria-label="Footer navigation">
+      <a href="research.html">Research</a>
+      <a href="../reports/llama-q4-900-eval-annotated.html">900 outputs</a>
+      <a href="https://github.com/adityavardhansharma/TypoPilot">GitHub</a>
+    </nav>
+  </footer>
+</body>
+</html>

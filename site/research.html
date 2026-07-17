@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="The complete TypoPilot model research: datasets, training runs, evaluations, latency, limitations, and reproducibility artifacts.">
+  <meta name="theme-color" content="#f4f6f0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Research | TypoPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Geologica:slnt,wght@-4..0,300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body class="research-page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header" data-header>
+    <a class="brand" href="index.html" aria-label="TypoPilot home"><span class="brand-mark" aria-hidden="true">✦</span><span>TypoPilot</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span>Menu</span><i aria-hidden="true"></i></button>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="index.html#how-it-works">How it works</a>
+      <a href="index.html#benchmarks">Benchmarks</a>
+      <a href="research.html" aria-current="page">Research</a>
+      <a class="nav-cta" href="https://github.com/adityavardhansharma/TypoPilot">View source <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="research-hero shell">
+      <div>
+        <p class="status-line"><span></span> Research record · updated 17 July 2026</p>
+        <h1>Every result.<br>Every trade-off.</h1>
+      </div>
+      <div class="research-hero-copy">
+        <p>This is the complete record behind TypoPilot’s public claims: model choices, training decisions, evaluation results, latency, failure modes, and the limits of cross-system comparisons.</p>
+        <div class="research-jump">
+          <a href="#recommended-model">Recommended model</a>
+          <a href="#evaluations">Evaluations</a>
+          <a href="#limitations">Limitations</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="research-summary" aria-label="Current model summary">
+      <div class="shell research-summary-grid">
+        <div><span>Recommended model</span><strong>Llama 3.2 1B + LoRA</strong><small>GGUF Q4_K_M</small></div>
+        <div><span>Core spelling exact</span><strong>83.23%</strong><small>541 / 650 examples</small></div>
+        <div><span>Full-suite exact</span><strong>69.89%</strong><small>629 / 900 examples</small></div>
+        <div><span>Typical short input</span><strong>344 ms</strong><small>average CPU inference</small></div>
+      </div>
+    </section>
+
+    <div class="research-shell shell">
+      <aside class="research-sidebar" aria-label="Research contents">
+        <p>Contents</p>
+        <nav>
+          <a href="#recommended-model">Recommended model</a>
+          <a href="#model-history">Model history</a>
+          <a href="#evaluations">Evaluations</a>
+          <a href="#latency">CPU performance</a>
+          <a href="#comparisons">Published systems</a>
+          <a href="#limitations">Limitations</a>
+          <a href="#methodology">Methodology</a>
+          <a href="#artifacts">Artifacts</a>
+        </nav>
+      </aside>
+
+      <article class="research-article">
+        <section id="recommended-model" class="research-section">
+          <div class="research-heading">
+            <span>Current recommendation</span>
+            <h2>A small contextual model, tuned to correct, not rewrite.</h2>
+          </div>
+          <p class="lead">The selected runtime is a fine-tuned Llama 3.2 1B model merged and quantised to GGUF Q4_K_M. Fine-tuning was essential: the untuned base model produced zero clean correction-only outputs across the eight manual cases.</p>
+
+          <div class="model-specimen">
+            <div class="specimen-title"><span>typopilot-llama32-1b-q4_k_m.gguf</span><i>selected</i></div>
+            <dl>
+              <div><dt>Model size</dt><dd>770.3 MB</dd></div>
+              <div><dt>Peak working set</dt><dd>1,327 MB</dd></div>
+              <div><dt>Median load</dt><dd>1,286 ms</dd></div>
+              <div><dt>Inference engine</dt><dd>llama.cpp · AVX2</dd></div>
+              <div><dt>Decoding</dt><dd>Greedy · cached prefix</dd></div>
+              <div><dt>Target hardware</dt><dd>8-core laptop CPU</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <section id="model-history" class="research-section">
+          <div class="research-heading">
+            <span>Model history</span>
+            <h2>What we trained, and what each experiment taught us.</h2>
+          </div>
+          <div class="research-timeline">
+            <article>
+              <span>Baseline</span><h3>Identity, rules, SymSpell</h3>
+              <p>Established the “do nothing” floor and exposed the cost of dictionary-only correction. SymSpell changed 44% of cases incorrectly in the early suite.</p>
+            </article>
+            <article>
+              <span>Byte-level pilot</span><h3>ByT5-small</h3>
+              <p>The first pilot halved CER from 10.1% to 5.0% and reached 43.8% exact match, proving the signal was learnable. Later versions improved spelling but still missed contextual grammar.</p>
+            </article>
+            <article>
+              <span>Contextual shift</span><h3>Llama 3.2 1B + LoRA</h3>
+              <p>A compact language model learned correction-only behaviour while using sentence context. The untuned base comparison demonstrated that the gain came from fine-tuning, not prompting alone.</p>
+            </article>
+            <article>
+              <span>Deployment pass</span><h3>F16 → Q8 → Q4_K_M</h3>
+              <p>Q4_K_M reduced model size by 67% versus F16 and produced the same eight clean outputs as Q8 in the manual test, at the lowest measured sentence latency.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="evaluations" class="research-section">
+          <div class="research-heading">
+            <span>Evaluation</span>
+            <h2>Three views of quality, kept separate.</h2>
+          </div>
+          <p>We do not collapse incompatible datasets into one headline score. The spelling subset measures the target behaviour, the full suite adds harder real-error material, and the public NSEC companion corpus stresses split and concatenated words.</p>
+
+          <div class="evaluation-block core-eval">
+            <header><div><span>Focused</span><h3>Core spelling subset</h3></div><p>650 examples</p></header>
+            <div class="evaluation-hero">
+              <div><strong>83.23%</strong><span>exact sentences</span></div>
+              <div class="cer-route" role="img" aria-label="Character error rate fell from 13.13 percent to 2.18 percent">
+                <span>13.13% input CER</span><i><b></b></i><span>2.18% output CER</span>
+              </div>
+            </div>
+            <div class="evaluation-facts">
+              <span><b>95.70%</b> word-accuracy proxy</span>
+              <span><b>83.4%</b> relative CER reduction</span>
+              <span><b>3.69%</b> overcorrection</span>
+              <span><b>344 ms</b> average latency</span>
+            </div>
+          </div>
+
+          <div class="evaluation-block">
+            <header><div><span>Mixed</span><h3>Complete mixed suite</h3></div><p>900 examples</p></header>
+            <div class="category-chart" role="img" aria-label="Exact match by category: light 92%, medium 84%, no change 98%, extreme 72%, heavy 71.3%, paragraphs 72%, real errors 10.7%">
+              <div><span>Clean preservation</span><i><b style="--value:98%"></b></i><strong>98.0</strong></div>
+              <div><span>Light noise</span><i><b style="--value:92%"></b></i><strong>92.0</strong></div>
+              <div><span>Medium noise</span><i><b style="--value:84%"></b></i><strong>84.0</strong></div>
+              <div><span>Extreme noise</span><i><b style="--value:72%"></b></i><strong>72.0</strong></div>
+              <div><span>Paragraphs</span><i><b style="--value:72%"></b></i><strong>72.0</strong></div>
+              <div><span>Heavy noise</span><i><b style="--value:71.3%"></b></i><strong>71.3</strong></div>
+              <div class="weak"><span>Real C4 errors</span><i><b style="--value:10.7%"></b></i><strong>10.7</strong></div>
+            </div>
+            <div class="evaluation-facts">
+              <span><b>69.89%</b> exact overall</span>
+              <span><b>4.28%</b> output CER</span>
+              <span><b>8.0%</b> overcorrection</span>
+              <span><b>469 ms</b> average latency</span>
+            </div>
+            <a class="research-link" href="../reports/llama-q4-900-eval-annotated.html">Inspect all 900 annotated outputs <span aria-hidden="true">↗</span></a>
+          </div>
+
+          <div class="evaluation-block public-eval">
+            <header><div><span>Stress</span><h3>Public split/concatenation stress test</h3></div><p>700 of 9,060 examples</p></header>
+            <div class="evaluation-hero">
+              <div><strong>50.14%</strong><span>exact sentences</span></div>
+              <p>The model improved 527 inputs, but overcorrected 128. Extreme word segmentation, such as letters separated one by one, remains a clear weakness.</p>
+            </div>
+            <div class="evaluation-facts">
+              <span><b>12.17%</b> output WER</span>
+              <span><b>18.29%</b> overcorrection</span>
+              <span><b>1.073 s</b> average latency</span>
+              <span><b>2.048 s</b> P95 latency</span>
+            </div>
+            <p class="scope-warning"><strong>Scope:</strong> this is the author’s downloadable NSEC companion corpus, not the unavailable 12-category test file used for the published LREC rankings.</p>
+          </div>
+        </section>
+
+        <section id="latency" class="research-section">
+          <div class="research-heading">
+            <span>Native CPU performance</span>
+            <h2>Quantisation changed the product equation.</h2>
+          </div>
+          <div class="variant-table-wrap">
+            <table class="variant-table">
+              <thead><tr><th>Variant</th><th>Size</th><th>Sentence mean</th><th>Clean outputs</th><th>Decision</th></tr></thead>
+              <tbody>
+                <tr><td>Base Q4</td><td>770 MB</td><td>4,590 ms</td><td>0 / 8</td><td>Rejected</td></tr>
+                <tr><td>Fine-tuned F16</td><td>2,365 MB</td><td>1,118 ms</td><td>7 / 8</td><td>Too large</td></tr>
+                <tr><td>Fine-tuned Q8</td><td>1,260 MB</td><td>696 ms</td><td>8 / 8</td><td>Strong</td></tr>
+                <tr class="selected"><td>Fine-tuned Q4_K_M</td><td>770 MB</td><td>444 ms</td><td>8 / 8</td><td>Selected</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-caption">AMD Ryzen 9 4900HS, 8 cores / 16 threads, AVX2. Greedy decoding with cached instruction prefix. Medians of three complete runs.</p>
+        </section>
+
+        <section id="comparisons" class="research-section">
+          <div class="research-heading">
+            <span>Published comparison</span>
+            <h2>Competitive evidence, without inventing a shared leaderboard.</h2>
+          </div>
+          <p>On its own spelling suite, TypoPilot’s 95.70% word-accuracy proxy is numerically above systems reported by the LREC 2020 comparison. The datasets and scorers differ, so TypoPilot remains officially unranked until it runs on the paper’s exact test inputs.</p>
+          <div class="published-ranking">
+            <div><span>1</span><strong>Transformer</strong><i>93.79% word accuracy</i></div>
+            <div><span>2</span><strong>LSTM</strong><i>93.00%</i></div>
+            <div><span>3</span><strong>BingSpell</strong><i>92.17%</i></div>
+            <div><span>4</span><strong>Grammarly</strong><i>91.62%</i></div>
+            <div><span>5</span><strong>Google</strong><i>91.14%</i></div>
+            <div class="candidate"><span>Unranked</span><strong>TypoPilot</strong><i>95.70% proxy · different test</i></div>
+          </div>
+          <p class="source-note">Source: <a href="https://aclanthology.org/2020.lrec-1.228/">Näther, LREC 2020</a>. Apple publishes no absolute CER, WER, or false-correction benchmark for its current autocorrect, so it cannot be placed responsibly.</p>
+        </section>
+
+        <section id="limitations" class="research-section limitations-section">
+          <div class="research-heading">
+            <span>Limitations</span>
+            <h2>What still breaks, and what we should train next.</h2>
+          </div>
+          <div class="limitations-list">
+            <article><h3>Real-world C4 errors</h3><p>Exact match falls to 10.67% and overcorrection rises to 31.33%. These examples differ sharply from the synthetic training distribution.</p></article>
+            <article><h3>Extreme segmentation</h3><p>The public split/concatenation sample reaches only 50.14% exact, showing that letter-by-letter splits and merged spans need dedicated training.</p></article>
+            <article><h3>Grammar is intentionally conservative</h3><p>The model was optimized primarily for spelling and minimal edits. It may preserve awkward grammar rather than rewrite professional or personal voice.</p></article>
+            <article><h3>English first</h3><p>The original vision includes Hinglish, but the current recommended model and reported results are English-focused. Hinglish should not be implied as complete.</p></article>
+            <article><h3>No official Apple/Gboard comparison</h3><p>Neither exposes a reproducible public API and absolute shared-dataset results are unavailable. Individual examples are useful demonstrations, not a universal ranking.</p></article>
+            <article><h3>CPU performance varies</h3><p>All reported native timings use one Ryzen 9 4900HS laptop. Sentence length, thread count, instruction set, and thermal state affect latency.</p></article>
+          </div>
+        </section>
+
+        <section id="methodology" class="research-section">
+          <div class="research-heading">
+            <span>Methodology</span>
+            <h2>How to read the numbers.</h2>
+          </div>
+          <dl class="method-list">
+            <div><dt>Exact match</dt><dd>The model output must equal the reference character for character, including capitalization and punctuation.</dd></div>
+            <div><dt>CER</dt><dd>Character edit distance divided by reference length. Lower is better.</dd></div>
+            <div><dt>WER</dt><dd>Word-token edit distance divided by reference token count. Lower is better.</dd></div>
+            <div><dt>Overcorrection</dt><dd>The output changed the input but ended farther from the reference than doing nothing.</dd></div>
+            <div><dt>Native timing</dt><dd>The model is loaded once, retained in memory, and receives a TSV batch through the C++ harness. Reported per-example latency excludes model load.</dd></div>
+            <div><dt>Cross-system ranking</dt><dd>Only systems evaluated on identical inputs with the same scorer should share an official position.</dd></div>
+          </dl>
+        </section>
+
+        <section id="artifacts" class="research-section artifacts-section">
+          <div class="research-heading">
+            <span>Reproducibility</span>
+            <h2>Open the evidence.</h2>
+          </div>
+          <div class="artifact-links">
+            <a href="../reports/llama-q4-900-eval-annotated.html"><span>Annotated evaluation</span><strong>All 900 outputs</strong><i>HTML ↗</i></a>
+            <a href="../reports/llama-variant-comparison.json"><span>Model variants</span><strong>F16, Q8, Q4 and base</strong><i>JSON ↗</i></a>
+            <a href="../reports/llama-cpu-harness-benchmark.json"><span>Native performance</span><strong>CPU benchmark record</strong><i>JSON ↗</i></a>
+            <a href="../experiments/llama32-1b-lora-001/native_suite_eval_q4/report.json"><span>900-example metrics</span><strong>Aggregate report</strong><i>JSON ↗</i></a>
+            <a href="../experiments/llama32-1b-lora-001/native_lrec_public_700_q4/report.json"><span>Public stress test</span><strong>700-example report</strong><i>JSON ↗</i></a>
+            <a href="https://github.com/adityavardhansharma/TypoPilot"><span>Source</span><strong>TypoPilot repository</strong><i>GitHub ↗</i></a>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer shell">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">✦</span><span>TypoPilot</span></a>
+    <p>A local noisy-text correction research project.</p>
+    <nav aria-label="Footer navigation"><a href="index.html">Home</a><a href="#main">Back to top</a><a href="https://github.com/adityavardhansharma/TypoPilot">GitHub</a></nav>
+  </footer>
+</body>
+</html>
