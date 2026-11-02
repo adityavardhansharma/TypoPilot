@@ -715,3 +715,151 @@ if (routesFigure) {
   }
   paint();
 }
+
+/* ---------- Evidence: 900 real outcomes, one square each ---------- */
+
+const ledger = document.querySelector('[data-ledger]');
+if (ledger) {
+  const grid = ledger.querySelector('[data-ledger-grid]');
+  const keys = [...ledger.querySelectorAll('[data-key]')];
+  const head = ledger.querySelector('[data-ins-head]');
+  const inputEl = ledger.querySelector('[data-ins-input]');
+  const outputEl = ledger.querySelector('[data-ins-output]');
+  const COLUMNS = 30;
+  const COUNTS = [['exact', 629], ['improved', 157], ['over', 72], ['other', 42]];
+  const LABELS = { exact: 'Exact match', improved: 'Improved, not exact', over: 'Overcorrected', other: 'Other outcome' };
+  const keyOf = (cell) => COUNTS.map(([name]) => name).find((name) => cell.classList.contains(`is-${name}`));
+  let rows = null;
+  let activeCell = null;
+
+  const fragment = document.createDocumentFragment();
+  let n = 0;
+  COUNTS.forEach(([key, total]) => {
+    for (let k = 0; k < total; k += 1) {
+      const cell = document.createElement('i');
+      cell.className = `is-${key}`;
+      cell.dataset.n = String(n);
+      cell.style.setProperty('--c', String(n % COLUMNS));
+      fragment.append(cell);
+      n += 1;
+    }
+  });
+  grid.append(fragment);
+
+  const inspect = (cell) => {
+    if (!cell) return;
+    activeCell?.classList.remove('is-hover');
+    activeCell = cell;
+    cell.classList.add('is-hover');
+    const index = Number(cell.dataset.n);
+    const row = rows?.[index];
+    head.replaceChildren();
+    if (row) {
+      const [ref, outcome, ms, input, output] = row;
+      const refEl = document.createElement('b');
+      refEl.textContent = ref;
+      head.append(refEl, ` · ${LABELS[outcome] || outcome} · ${ms} ms`);
+      inputEl.textContent = input;
+      outputEl.textContent = output;
+    } else {
+      const refEl = document.createElement('b');
+      refEl.textContent = `#${index + 1}`;
+      head.append(refEl, ` · ${LABELS[keyOf(cell)]}`);
+      inputEl.textContent = 'Open the full report to read this example.';
+      outputEl.textContent = '—';
+    }
+    ledger.classList.add('is-inspecting');
+  };
+
+  // Real per-example data is generated at build time; the grid still shows the counts without it.
+  fetch('/data/outcomes.json')
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      if (Array.isArray(data) && data.length === n) {
+        rows = data;
+        ledger.classList.add('has-data');
+        if (activeCell) inspect(activeCell);
+      }
+    })
+    .catch(() => {});
+
+  const focusKey = (key) => {
+    if (key) ledger.dataset.focus = key;
+    else delete ledger.dataset.focus;
+  };
+  let pinned = null;
+  keys.forEach((button) => {
+    const key = button.dataset.key;
+    button.addEventListener('pointerenter', () => focusKey(key));
+    button.addEventListener('pointerleave', () => focusKey(pinned));
+    button.addEventListener('click', () => {
+      pinned = pinned === key ? null : key;
+      keys.forEach((other) => other.setAttribute('aria-pressed', String(other.dataset.key === pinned)));
+      focusKey(pinned ?? key);
+    });
+  });
+
+  grid.addEventListener('pointerover', (event) => {
+    const cell = event.target.closest('i');
+    if (cell) inspect(cell);
+  });
+  grid.addEventListener('pointerdown', (event) => {
+    const cell = event.target.closest('i');
+    if (cell) inspect(cell);
+  });
+  grid.addEventListener('pointerleave', () => {
+    activeCell?.classList.remove('is-hover');
+  });
+
+  onceVisible([grid], () => grid.classList.add('is-in'), { threshold: 0.2 });
+}
+
+/* ---------- Lineage: a route that draws itself, waypoint by waypoint ---------- */
+
+const lineage = document.querySelector('[data-lineage]');
+if (lineage) {
+  const path = lineage.querySelector('[data-lineage-path]');
+  const plane = lineage.querySelector('[data-lineage-plane]');
+  const stops = [...lineage.querySelectorAll('[data-stop]')];
+  const marks = [0.12, 0.4, 0.68, 0.92];
+
+  const place = (progress) => {
+    const length = path.getTotalLength();
+    const point = path.getPointAtLength(length * progress);
+    const ahead = path.getPointAtLength(length * Math.min(1, progress + 0.012));
+    const angle = Math.atan2(ahead.y - point.y, ahead.x - point.x) * (180 / Math.PI);
+    plane.setAttribute('transform', `translate(${point.x} ${point.y}) rotate(${angle + 90})`);
+    path.style.strokeDashoffset = (1 - progress).toFixed(4);
+    stops.forEach((stop, index) => stop.classList.toggle('is-passed', progress >= marks[index]));
+  };
+
+  const update = () => {
+    place(reducedMotion.matches ? 1 : viewProgress(lineage, 0.85, 0.28));
+  };
+  (document.fonts?.ready ?? Promise.resolve()).then(() => {
+    update();
+    scrollHandlers.add(update);
+  });
+}
+
+/* ---------- Research contents: the rule tracks the section in view ---------- */
+
+const toc = document.querySelector('[data-toc]');
+if (toc) {
+  const links = [...toc.querySelectorAll('a[href^="#"]')];
+  const sections = links.map((link) => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+  const update = () => {
+    const mark = window.scrollY + 140;
+    let current = sections[0];
+    sections.forEach((section) => {
+      if (section.offsetTop <= mark) current = section;
+    });
+    links.forEach((link) => {
+      const on = current && link.getAttribute('href') === `#${current.id}`;
+      if (on) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  scrollHandlers.add(update);
+  update();
+}

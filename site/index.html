@@ -22,6 +22,7 @@
         <a href="#arrivals">Spellings</a>
         <a href="#method">Method</a>
         <a href="#benchmarks">Benchmarks</a>
+        <a href="#evidence">Evidence</a>
         <a href="/research">Research</a>
       </nav>
       <a class="masthead-source link" href="https://github.com/adityavardhansharma/TypoPilot">Source <span class="arrow" aria-hidden="true">↗</span></a>
@@ -187,9 +188,108 @@
         <p class="facts-note data">Medians of three complete native CPU runs · AMD Ryzen 9 4900HS · AVX2 · 16 threads</p>
       </div>
     </section>
-    <!-- evidence -->
-    <!-- route -->
-    <!-- closing -->
+    <section class="section evidence" id="evidence" aria-labelledby="evidence-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker data" data-reveal><b>04</b> Evidence</p>
+          <h2 id="evidence-title" data-lines>Not a highlight reel. <em>Every&nbsp;output, on&nbsp;the&nbsp;record.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">The final model improved 687 of 900 inputs and matched 629 references exactly. Every square below is one real example — point at it to read it, misses included.</p>
+        </div>
+        <div class="ledger" data-ledger>
+          <div class="ledger-side">
+            <div class="ledger-inspector" data-ledger-inspector>
+              <p class="data" data-ins-head>Point at a square</p>
+              <p class="ins-line"><span class="data">Typed</span><span data-ins-input>—</span></p>
+              <p class="ins-line"><span class="data">Model</span><span data-ins-output>—</span></p>
+            </div>
+            <div class="ledger-keys" role="group" aria-label="Highlight an outcome">
+            <button type="button" class="ledger-key" data-key="exact" aria-pressed="false"><i class="swatch is-exact"></i><b>629</b><span>Exact match</span><em>69.9%</em></button>
+            <button type="button" class="ledger-key" data-key="improved" aria-pressed="false"><i class="swatch is-improved"></i><b>157</b><span>Improved, not exact</span><em>17.4%</em></button>
+            <button type="button" class="ledger-key" data-key="over" aria-pressed="false"><i class="swatch is-over"></i><b>72</b><span>Overcorrected</span><em>8.0%</em></button>
+            <button type="button" class="ledger-key" data-key="other" aria-pressed="false"><i class="swatch is-other"></i><b>42</b><span>Other outcomes</span><em>4.7%</em></button>
+            </div>
+            <a class="button" href="/reports/llama-q4-900-eval-annotated.html">Open the full report <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+          <div class="ledger-grid" data-ledger-grid role="img" aria-label="900 squares, one per evaluation example: 629 exact matches, 157 improved but not exact, 72 overcorrected, 42 other outcomes.">
+            <noscript>JavaScript draws the 900 squares. The annotated report still lists every output.</noscript>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section local" aria-labelledby="local-title">
+      <div class="wrap local-grid">
+        <div>
+          <p class="kicker data" data-reveal><b>05</b> On device</p>
+          <h2 id="local-title" data-lines>Nothing leaves <em>the&nbsp;cockpit.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">The final model runs through a native llama.cpp harness on an ordinary eight-core laptop CPU. Load it once and correction becomes a sub-second interaction for typical sentences.</p>
+        </div>
+        <dl class="spec" data-reveal style="--delay:150">
+          <div><dt class="data">Network requests</dt><dd><b class="is-signal">0</b></dd></div>
+          <div><dt class="data">Runtime</dt><dd>Native C++ · llama.cpp · AVX2</dd></div>
+          <div><dt class="data">Threads</dt><dd>16 on 8 cores</dd></div>
+          <div><dt class="data">Format</dt><dd>GGUF · Q4_K_M · 770.3 MB</dd></div>
+          <div><dt class="data">Median load</dt><dd>1.29 s, once</dd></div>
+          <div><dt class="data">Decoding</dt><dd>Greedy · cached instruction prefix</dd></div>
+        </dl>
+      </div>
+    </section>
+    <section class="section lineage" id="lineage" aria-labelledby="lineage-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker data" data-reveal><b>06</b> Lineage</p>
+          <h2 id="lineage-title" data-lines>Four experiments. <em>One landing.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">Every waypoint is a model that was actually trained. Scroll draws the route; the aircraft that stayed small, and still spelled, is the one that flies.</p>
+        </div>
+        <figure class="lineage-chart" data-lineage>
+          <svg class="lineage-svg" viewBox="0 0 1000 250" role="img" aria-label="Lineage from dictionary baselines, through ByT5-small and Llama 3.2 1B, to the selected Q4_K_M.">
+            <path class="lineage-track" d="M70 190 C 220 190, 250 78, 370 74 S 560 200, 660 176 S 820 64, 930 70" />
+            <path class="lineage-flown" data-lineage-path pathLength="1" d="M70 190 C 220 190, 250 78, 370 74 S 560 200, 660 176 S 820 64, 930 70" />
+            <g data-lineage-plane transform="translate(70 190) rotate(90)">
+              <path transform="translate(-17 -17) scale(0.42)" d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/>
+            </g>
+          </svg>
+          <ol class="lineage-stops">
+            <li data-stop>
+              <span class="data">01 · Floor</span>
+              <strong>Rules &amp; SymSpell</strong>
+              <p>Dictionary only. In the early suite, SymSpell changed 44% of cases incorrectly.</p>
+            </li>
+            <li data-stop>
+              <span class="data">02 · Pilot</span>
+              <strong>ByT5-small</strong>
+              <p>Character error fell from 10.1% to 5.0%, and exact match reached 43.8%.</p>
+            </li>
+            <li data-stop>
+              <span class="data">03 · Context</span>
+              <strong>Llama 3.2 1B</strong>
+              <p>A LoRA fine-tune. The same model, untuned, cleaned 0 of 8 manual cases.</p>
+            </li>
+            <li data-stop class="is-selected">
+              <span class="data">04 · Selected</span>
+              <strong>Q4_K_M</strong>
+              <p>770 MB, 444 ms mean, 8 of 8 clean. This is the aircraft.</p>
+            </li>
+          </ol>
+        </figure>
+      </div>
+    </section>
+
+    <section class="closing" id="depart" aria-labelledby="closing-title">
+      <div class="wrap">
+        <p class="closing-meta data" data-reveal><span>Dep · as typed</span><span>Arr · as meant</span></p>
+        <h2 id="closing-title" data-lines>Type fast. <em>We’ll read through it.</em></h2>
+        <p class="lede closing-lede" data-reveal style="--delay:160">629 of 900 references matched exactly, on a laptop CPU, with the model kept on the machine that typed them. The other 271 are published too.</p>
+        <div class="closing-runway" data-reveal style="--delay:240" aria-hidden="true">
+          <b></b>
+          <span class="closing-plane"><svg viewBox="0 0 80 80"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span>
+        </div>
+        <div class="closing-actions" data-reveal style="--delay:320">
+          <a class="button" href="/research">Read the full record <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="link" href="https://github.com/adityavardhansharma/TypoPilot">View the source <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="colophon">
