@@ -4,326 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="TypoPilot is a compact local model for correcting heavily mistyped English with sentence context.">
-  <meta name="theme-color" content="#0b0f1a">
+  <meta name="theme-color" content="#f7f3ec">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <title>TypoPilot — Type fast. We’ll read through it.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter+Tight:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="site-header" data-header>
-    <div class="header-bar">
-      <a class="brand" href="/" aria-label="TypoPilot home">
-        <span class="brand-mark"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span>
-        <span>TypoPilot</span>
-      </a>
-      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
-        <a href="#how-it-works">How it works</a>
+  <header class="masthead" data-header>
+    <div class="masthead-inner wrap">
+      <a class="wordmark" href="/" aria-label="TypoPilot home"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg><span>TypoPilot</span></a>
+      <nav class="masthead-nav" id="site-nav" aria-label="Main navigation">
+        <a href="#arrivals">Spellings</a>
+        <a href="#method">Method</a>
         <a href="#benchmarks">Benchmarks</a>
-        <a href="#evidence">Evidence</a>
         <a href="/research">Research</a>
-        <a class="nav-cta" href="https://github.com/adityavardhansharma/TypoPilot">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
       </nav>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
-        <i aria-hidden="true"></i><i aria-hidden="true"></i>
-      </button>
+      <a class="masthead-source link" href="https://github.com/adityavardhansharma/TypoPilot">Source <span class="arrow" aria-hidden="true">↗</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
     </div>
-    <span class="scroll-progress" data-scroll-progress aria-hidden="true"></span>
   </header>
 
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-sky" aria-hidden="true">
-        <span class="hero-glow"></span>
-        <span class="keycap" style="--x:8%;--y:24%;--r:-14deg;--d:0s">hte</span>
-        <span class="keycap" style="--x:86%;--y:18%;--r:10deg;--d:-2s">teh</span>
-        <span class="keycap" style="--x:4%;--y:64%;--r:8deg;--d:-4s">⌫</span>
-        <span class="keycap" style="--x:91%;--y:58%;--r:-8deg;--d:-1s">recieve</span>
-        <span class="keycap" style="--x:78%;--y:84%;--r:6deg;--d:-3s">dno't</span>
-      </div>
-      <div class="shell hero-inner">
-        <p class="eyebrow is-live" data-reveal>Local model research · in active development</p>
-        <h1 id="hero-title" class="hero-title" data-reveal style="--delay:90">Autocorrect for the mistakes autocorrect <em>can’t read.</em></h1>
-        <p class="hero-lede" data-reveal style="--delay:180">TypoPilot uses sentence context to recover heavily mistyped English — locally, privately, and at useful laptop-CPU speed.</p>
-        <div class="hero-actions" data-reveal style="--delay:270">
-          <a class="button" href="/research">Read the research <span class="arrow" aria-hidden="true">↗</span></a>
-          <a class="button button-ghost" href="#benchmarks">See the benchmarks <span aria-hidden="true">↓</span></a>
-        </div>
-
-        <figure class="editor" data-editor data-reveal style="--delay:380" aria-label="Live demonstration: a mistyped sentence is typed, read in context, and corrected">
-          <div class="editor-chrome">
-            <span class="editor-lights" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="editor-title mono">typopilot · llama-3.2-1b · q4_k_m</span>
-            <span class="editor-status mono" data-editor-status>Ready</span>
-          </div>
-          <div class="editor-body">
-            <span class="editor-scan" aria-hidden="true"></span>
-            <div class="editor-line is-input">
-              <span class="line-tag mono">Input</span>
-              <p class="editor-text" data-editor-input></p>
-            </div>
-            <div class="editor-line is-output">
-              <span class="line-tag mono">Output</span>
-              <p class="editor-text" data-editor-output></p>
-            </div>
-          </div>
-          <figcaption class="editor-foot mono">
-            <span><b data-editor-edits>0</b> words repaired</span>
-            <span><b>344 ms</b> avg on CPU</span>
-            <span><b>0</b> bytes sent</span>
-            <span class="editor-pager" data-editor-pager role="group" aria-label="Choose example"></span>
-          </figcaption>
-          <p class="sr-only" aria-live="polite" data-editor-live></p>
-        </figure>
-      </div>
-    </section>
-
-    <section class="metrics" aria-label="Selected evaluation results">
-      <div class="marquee" aria-hidden="true">
-        <div class="marquee-track"><div><span><s>Lest</s><i>→</i>Let's</span><span><s>looknig</s><i>→</i>looking</span><span><s>hte</s><i>→</i>the</span><span><s>arrenemenst</s><i>→</i>arrangements</span><span><s>inmytaVor</s><i>→</i>in my favor</span><span><s>sounnds</s><i>→</i>sounds</span><span><s>dno't</s><i>→</i>don't</span><span><s>tjhe</s><i>→</i>the</span><span><s>pa rty</s><i>→</i>party</span><span><s>biiT</s><i>→</i>bit</span><span><s>Itt</s><i>→</i>It</span><span><s>inda</s><i>→</i>mind</span></div><div><span><s>Lest</s><i>→</i>Let's</span><span><s>looknig</s><i>→</i>looking</span><span><s>hte</s><i>→</i>the</span><span><s>arrenemenst</s><i>→</i>arrangements</span><span><s>inmytaVor</s><i>→</i>in my favor</span><span><s>sounnds</s><i>→</i>sounds</span><span><s>dno't</s><i>→</i>don't</span><span><s>tjhe</s><i>→</i>the</span><span><s>pa rty</s><i>→</i>party</span><span><s>biiT</s><i>→</i>bit</span><span><s>Itt</s><i>→</i>It</span><span><s>inda</s><i>→</i>mind</span></div></div>
-      </div>
-      <div class="shell">
-        <dl class="metric-grid" data-stagger>
-          <div class="metric">
-            <dt>exact spelling accuracy</dt>
-            <dd><span data-count="83.23" data-decimals="2">83.23</span><small>%</small></dd>
-            <span class="meter" style="--v:83.23%" aria-hidden="true"><i></i></span>
-          </div>
-          <div class="metric">
-            <dt>relative CER reduction</dt>
-            <dd><span data-count="83.4" data-decimals="1">83.4</span><small>%</small></dd>
-            <span class="meter" style="--v:83.4%" aria-hidden="true"><i></i></span>
-          </div>
-          <div class="metric">
-            <dt>average short-input CPU time</dt>
-            <dd><span data-count="344" data-decimals="0">344</span><small>ms</small></dd>
-            <span class="meter" style="--v:34.4%" aria-hidden="true"><i></i></span>
-          </div>
-          <div class="metric">
-            <dt>clean-text preservation</dt>
-            <dd><span data-count="98.02" data-decimals="2">98.02</span><small>%</small></dd>
-            <span class="meter" style="--v:98.02%" aria-hidden="true"><i></i></span>
-          </div>
-        </dl>
-        <p class="metric-scope mono" data-reveal>650-example spelling subset · Ryzen 9 4900HS CPU · <a class="text-link" href="/research#methodology">Methodology ↗</a></p>
-      </div>
-    </section>
-
-    <section class="section" id="how-it-works" aria-labelledby="how-title">
-      <div class="shell">
-        <div class="section-head is-split">
-          <div data-reveal>
-            <p class="eyebrow">How it works</p>
-            <h2 id="how-title">Reads the <em>sentence,</em> not the word.</h2>
-          </div>
-          <p data-reveal style="--delay:120">Conventional checkers often solve one word at a time. TypoPilot reads the damage as a sentence, then makes the smallest correction it can justify.</p>
-        </div>
-
-        <ol class="pipeline" data-stagger>
-          <li><span class="step mono">01</span><h3>Read the whole line</h3><p>The full sentence goes in, typos and all. No word is judged alone.</p></li>
-          <li><span class="step mono">02</span><h3>Infer the intent</h3><p>A fine-tuned 1B model uses the surrounding words to decide what you meant.</p></li>
-          <li><span class="step mono">03</span><h3>Edit minimally</h3><p>Only damaged words change. Clean text — and your voice — stay put.</p></li>
-        </ol>
-
-        <div class="bento" data-stagger>
-          <article class="bento-card is-wide" data-spotlight>
-            <header><span class="bento-kind">Heavy keyboard damage</span><span class="bento-tag mono">repeats · doubled keys</span></header>
-            <div class="swap">
-              <p class="swap-before"><span class="mono">in</span><s>Itt sounnds sounnds dangerous.</s></p>
-              <p class="swap-after"><span class="mono">out</span>It sounds dangerous.</p>
-            </div>
-            <p class="bento-note">Doubled letters and a stuttered word, resolved in one pass.</p>
-          </article>
-          <article class="bento-card " data-spotlight>
-            <header><span class="bento-kind">Merged &amp; split words</span><span class="bento-tag mono">segmentation</span></header>
-            <div class="swap">
-              <p class="swap-before"><span class="mono">in</span><s>I'll c to hte arrenemenst for tjhe pa rty.</s></p>
-              <p class="swap-after"><span class="mono">out</span>I'll see to the arrangements for the party.</p>
-            </div>
-            <p class="bento-note">Phonetic shorthand and a split word, rejoined by context.</p>
-          </article>
-          <article class="bento-card " data-spotlight>
-            <header><span class="bento-kind">Meaning from context</span><span class="bento-tag mono">intent</span></header>
-            <div class="swap">
-              <p class="swap-before"><span class="mono">in</span><s>luck turNed inmytaVor.</s></p>
-              <p class="swap-after"><span class="mono">out</span>Luck turned in my favor.</p>
-            </div>
-            <p class="bento-note">Three words fused together, with stray capitals.</p>
-          </article>
-          <article class="bento-card bento-stat" data-spotlight>
-            <span class="bento-kind">Restraint</span>
-            <p class="bento-figure"><span data-count="99" data-decimals="0">99</span><small>/ 101</small></p>
-            <p class="bento-note">already-correct examples left untouched in the 900-example suite.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section benchmarks" id="benchmarks" aria-labelledby="speed-title">
-      <div class="shell">
-        <div class="section-head is-split">
-          <div data-reveal>
-            <p class="eyebrow">Same model · same eight inputs · same CPU</p>
-            <h2 id="speed-title">The fastest variant kept <em>every</em> clean output.</h2>
-          </div>
-          <p data-reveal style="--delay:120">Quantising to Q4_K_M cut sentence latency and model size without losing a correct output in the manual comparison.</p>
-        </div>
-
-        <div class="bench-grid">
-          <div class="race panel" data-race data-reveal role="img" aria-label="Mean sentence latency: Q4_K_M 444 milliseconds, Q8 696 milliseconds, F16 1,118 milliseconds">
-            <div class="race-head mono"><span>Mean sentence latency</span><span>lower is better</span></div>
-            <div class="race-lanes">
-              <div class="lane is-winner" style="--n:0.37">
-                <span class="lane-name mono">Q4_K_M</span>
-                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
-                <strong class="mono">444<small> ms</small></strong>
-              </div>
-              <div class="lane" style="--n:0.58">
-                <span class="lane-name mono">Q8</span>
-                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
-                <strong class="mono">696<small> ms</small></strong>
-              </div>
-              <div class="lane" style="--n:0.932">
-                <span class="lane-name mono">F16</span>
-                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
-                <strong class="mono">1,118<small> ms</small></strong>
-              </div>
-            </div>
-            <div class="race-axis mono" aria-hidden="true"><span>0</span><span>400</span><span>800</span><span>1,200 ms</span></div>
-            <p class="race-note">Medians of three complete native CPU runs.</p>
-          </div>
-
-          <div class="champion" data-reveal style="--delay:150">
-            <span class="champion-rank mono">#1</span>
-            <p class="champion-figure"><span data-count="444" data-decimals="0">444</span><small>ms</small></p>
-            <p>Fastest of the three fine-tuned variants tested — mean across seven sentences.</p>
-          </div>
-        </div>
-
-        <div class="fact-grid" data-stagger>
-          <div class="fact panel" data-spotlight>
-            <span class="fact-label mono">Model size</span>
-            <strong>770.3 MB</strong>
-            <div class="size-compare" aria-hidden="true"><i style="--s:1"></i><i style="--s:0.533"></i><i class="is-active" style="--s:0.326"></i></div>
-            <small>67% smaller than F16</small>
-          </div>
-          <div class="fact panel" data-spotlight>
-            <span class="fact-label mono">Clean outputs</span>
-            <strong>8 / 8</strong>
-            <div class="lit-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <small>sentences + paragraph</small>
-          </div>
-          <div class="fact panel" data-spotlight>
-            <span class="fact-label mono">Peak memory</span>
-            <strong>1.30 GB</strong>
-            <div class="mem-gauge" aria-hidden="true"><i></i></div>
-            <small>native working set</small>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="evidence" aria-labelledby="evidence-title">
-      <div class="shell evidence-layout">
-        <div class="evidence-copy">
-          <div data-reveal>
-            <p class="eyebrow">The complete 900-example suite</p>
-            <h2 id="evidence-title">Not a highlight reel. <em>Every</em> output is inspectable.</h2>
-          </div>
-          <p data-reveal style="--delay:100">The final model improved 687 inputs, exactly matched 629 references, and preserved 99 of 101 unchanged examples. The full report includes successes, misses, and overcorrections.</p>
-          <div class="legend" data-stagger role="group" aria-label="Highlight an outcome">
-            <button type="button" class="legend-item" data-filter="exact" aria-pressed="false"><i class="dot exact"></i><strong>629</strong><span>exact match</span></button>
-            <button type="button" class="legend-item" data-filter="improved" aria-pressed="false"><i class="dot improved"></i><strong>157</strong><span>improved, not exact</span></button>
-            <button type="button" class="legend-item" data-filter="over" aria-pressed="false"><i class="dot over"></i><strong>72</strong><span>overcorrected</span></button>
-            <button type="button" class="legend-item" data-filter="neutral" aria-pressed="false"><i class="dot neutral"></i><strong>42</strong><span>other outcomes</span></button>
-          </div>
-          <a class="button" href="/reports/llama-q4-900-eval-annotated.html" data-reveal>Inspect all 900 outputs <span class="arrow" aria-hidden="true">↗</span></a>
-        </div>
-        <div class="dot-panel panel" data-reveal style="--delay:150" role="img" aria-label="A field of 900 dots representing mutually exclusive evaluation outcomes: 629 exact, 157 improved but not exact, 72 overcorrected, and 42 other outcomes">
-          <div class="dot-panel-head mono"><span>n = 900</span><span data-dot-readout>All outcomes</span></div>
-          <div class="dot-field" data-dot-field aria-hidden="true"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section local" aria-labelledby="local-title">
-      <div class="shell local-layout">
-        <div class="device" data-reveal aria-hidden="true">
-          <span class="device-label mono">Your machine · 8-core laptop CPU</span>
-          <div class="flow">
-            <div class="node"><span>Your text</span><small class="mono is-coral">“hte”</small></div>
-            <div class="wire"><i></i></div>
-            <div class="node node-chip"><span>770 MB model</span><small class="mono">Q4_K_M · GGUF</small></div>
-            <div class="wire"><i></i></div>
-            <div class="node node-out"><span>Corrected</span><small class="mono is-lime">“the”</small></div>
-          </div>
-          <div class="cloud-blocked mono"><span>Cloud API</span><b>0 requests</b></div>
-        </div>
-        <div class="local-copy">
-          <div data-reveal>
-            <p class="eyebrow">Local by design</p>
-            <h2 id="local-title">Context without the <em>cloud</em> round-trip.</h2>
-          </div>
-          <p data-reveal style="--delay:100">The final model runs through a native llama.cpp harness on an ordinary eight-core laptop CPU. Keeping the model loaded turns correction into a sub-second interaction for typical sentences.</p>
-          <dl class="spec-list" data-stagger>
-            <div><dt class="mono">Runtime</dt><dd>Native C++ · AVX2 · 16 threads</dd></div>
-            <div><dt class="mono">Format</dt><dd>GGUF · Q4_K_M</dd></div>
-            <div><dt class="mono">Median load</dt><dd>1.29 seconds</dd></div>
-          </dl>
-        </div>
-      </div>
-    </section>
-
-    <section class="section research-teaser" aria-labelledby="research-title">
-      <div class="shell">
-        <div class="section-head is-split">
-          <div data-reveal>
-            <p class="eyebrow">Research, designed to be read</p>
-            <h2 id="research-title">Every model. Every trade-off. <em>Every</em> limitation.</h2>
-          </div>
-          <div class="teaser-route" data-reveal style="--delay:120">
-            <p>Follow the project from rule-based baselines through ByT5 experiments to the final fine-tuned and quantised Llama model.</p>
-            <a class="button button-ghost" href="/research">Open the research <span class="arrow" aria-hidden="true">↗</span></a>
-          </div>
-        </div>
-        <ol class="lineage" data-stagger aria-label="Model research timeline">
-          <li><span class="mono">Baseline</span><strong>Rules + SymSpell</strong><small>44% overcorrection exposed the gap.</small></li>
-          <li><span class="mono">Byte-level</span><strong>ByT5-small</strong><small>Promising spelling, inconsistent grammar.</small></li>
-          <li><span class="mono">Contextual</span><strong>Llama 3.2 1B + LoRA</strong><small>Correction-only behaviour learned.</small></li>
-          <li><span class="mono">Final runtime</span><strong>Q4_K_M</strong><small>Best measured quality–speed balance.</small></li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="closing" aria-labelledby="closing-title">
-      <div class="shell closing-inner">
-        <span class="closing-mark" aria-hidden="true"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span>
-        <h2 id="closing-title" aria-label="Type fast. We’ll read through it."><span data-scramble aria-hidden="true">Type fast.</span><br><em data-scramble aria-hidden="true">We’ll read through it.</em></h2>
-        <div class="hero-actions">
-          <a class="button" href="/research">Read how it was built <span class="arrow" aria-hidden="true">↗</span></a>
-          <a class="button button-ghost" href="https://github.com/adityavardhansharma/TypoPilot">View source</a>
-        </div>
-      </div>
-    </section>
+    <!-- hero -->
+    <!-- arrivals -->
+    <!-- figures -->
+    <!-- method -->
+    <!-- benchmarks -->
+    <!-- evidence -->
+    <!-- route -->
+    <!-- closing -->
   </main>
 
-  <footer class="site-footer">
-    <div class="shell footer-inner">
-      <div class="footer-top">
-        <a class="brand" href="/"><span class="brand-mark"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span>TypoPilot</span></a>
-        <p>A local noisy-text correction research project.</p>
-        <nav aria-label="Footer navigation">
-          <a href="/">Home</a>
-          <a href="/research">Research</a>
-          <a href="/reports/llama-q4-900-eval-annotated.html">900 outputs</a>
-          <a href="https://github.com/adityavardhansharma/TypoPilot">GitHub ↗</a>
-        </nav>
+  <footer class="colophon">
+    <div class="wrap">
+      <div class="colophon-grid">
+        <div>
+          <a class="wordmark" href="/"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg><span>TypoPilot</span></a>
+          <p>A local noisy-text correction research project. Type fast — it reads through it.</p>
+        </div>
+        <div>
+          <h3>Site</h3>
+          <ul><li><a href="/">Home</a></li><li><a href="/research">Research</a></li><li><a href="/reports/llama-q4-900-eval-annotated.html">All 900 outputs</a></li></ul>
+        </div>
+        <div>
+          <h3>Source</h3>
+          <ul><li><a href="https://github.com/adityavardhansharma/TypoPilot">GitHub</a></li><li><a href="/reports/llama-variant-comparison.json">Variant data</a></li><li><a href="/reports/llama-cpu-harness-benchmark.json">CPU benchmark</a></li></ul>
+        </div>
       </div>
-      <p class="footer-word" aria-hidden="true">TypoPilot</p>
+      <div class="colophon-base data"><span>TP / LOCAL / 001</span><span>Llama 3.2 1B · LoRA · GGUF Q4_K_M</span><span>Ryzen 9 4900HS · 8C/16T</span></div>
     </div>
   </footer>
 </body>

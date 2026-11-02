@@ -1,44 +1,58 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const root = document.documentElement;
+root.classList.add('js');
 
-/* ---------- Header: menu, scrolled state, progress ---------- */
+const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeInOut = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+const easeOut = (t) => 1 - Math.pow(1 - t, 4);
 
-const header = document.querySelector('[data-header]');
-const navToggle = document.querySelector('.nav-toggle');
-const progressBar = document.querySelector('[data-scroll-progress]');
+/* ---------- Masthead ---------- */
 
-if (header && navToggle) {
-  const setNav = (open) => {
-    navToggle.setAttribute('aria-expanded', String(open));
-    navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    header.classList.toggle('is-open', open);
+const masthead = document.querySelector('[data-header]');
+const menuToggle = document.querySelector('.menu-toggle');
+if (masthead && menuToggle) {
+  const setMenu = (open) => {
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.textContent = open ? 'Close' : 'Menu';
+    masthead.classList.toggle('is-open', open);
   };
-  navToggle.addEventListener('click', () => setNav(navToggle.getAttribute('aria-expanded') !== 'true'));
-  header.querySelector('.site-nav')?.addEventListener('click', (event) => {
-    if (event.target.closest('a')) setNav(false);
+  menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
+  masthead.querySelector('nav')?.addEventListener('click', (event) => {
+    if (event.target.closest('a')) setMenu(false);
   });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') setNav(false);
+    if (event.key === 'Escape') setMenu(false);
   });
 }
 
+/* ---------- Scroll loop: one rAF-driven pass for every scroll-linked piece ---------- */
+
+const scrollHandlers = new Set();
 let scrollQueued = false;
-const onScroll = () => {
+const runScroll = () => {
   scrollQueued = false;
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  header?.classList.toggle('is-scrolled', window.scrollY > 24);
-  progressBar?.style.setProperty('--progress', max > 0 ? (window.scrollY / max).toFixed(4) : '0');
+  masthead?.classList.toggle('is-scrolled', window.scrollY > 8);
+  scrollHandlers.forEach((handler) => handler());
 };
-window.addEventListener('scroll', () => {
-  if (!scrollQueued) {
-    scrollQueued = true;
-    requestAnimationFrame(onScroll);
-  }
-}, { passive: true });
-onScroll();
+const requestScroll = () => {
+  if (scrollQueued) return;
+  scrollQueued = true;
+  requestAnimationFrame(runScroll);
+};
+window.addEventListener('scroll', requestScroll, { passive: true });
+window.addEventListener('resize', requestScroll, { passive: true });
 
-/* ---------- Scroll reveal ---------- */
+// 0 when the element's top meets `start` (fraction of viewport), 1 when it meets `end`.
+const viewProgress = (element, start = 0.9, end = 0.2) => {
+  const rect = element.getBoundingClientRect();
+  const h = window.innerHeight;
+  return clamp((h * start - rect.top) / (h * (start - end)));
+};
 
-const whenVisible = (elements, callback, options = {}) => {
+/* ---------- Reveal on view ---------- */
+
+const onceVisible = (elements, callback, options = {}) => {
   if (!('IntersectionObserver' in window)) {
     elements.forEach(callback);
     return;
@@ -46,282 +60,36 @@ const whenVisible = (elements, callback, options = {}) => {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      callback(entry.target);
       observer.unobserve(entry.target);
+      callback(entry.target);
     });
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12, ...options });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.15, ...options });
   elements.forEach((element) => observer.observe(element));
 };
 
-document.querySelectorAll('[data-stagger]').forEach((group) => {
-  [...group.children].forEach((child, index) => child.style.setProperty('--i', index));
-});
-document.documentElement.classList.add('js');
-whenVisible([...document.querySelectorAll('[data-reveal], [data-stagger]')], (element) => {
-  element.classList.add('is-visible');
-});
-
-/* ---------- Hero: live correction editor ---------- */
-
-// Marks which words in each sentence survive unchanged (longest common subsequence).
-const diffWords = (a, b) => {
-  const table = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
-  for (let i = a.length - 1; i >= 0; i -= 1) {
-    for (let j = b.length - 1; j >= 0; j -= 1) {
-      table[i][j] = a[i] === b[j] ? table[i + 1][j + 1] + 1 : Math.max(table[i + 1][j], table[i][j + 1]);
+// Split headings into masked lines once fonts have settled, so line breaks are real.
+const splitLines = (element) => {
+  const words = element.innerHTML.trim().split(/\s+(?![^<]*>)/);
+  element.innerHTML = words.map((word) => `<span class="w">${word}</span>`).join(' ');
+  const lines = [];
+  let lastTop = null;
+  element.querySelectorAll('.w').forEach((word) => {
+    const top = Math.round(word.offsetTop);
+    if (top !== lastTop) {
+      lines.push([]);
+      lastTop = top;
     }
-  }
-  const keptInput = new Set();
-  const keptOutput = new Set();
-  let i = 0;
-  let j = 0;
-  while (i < a.length && j < b.length) {
-    if (a[i] === b[j]) {
-      keptInput.add(i); keptOutput.add(j); i += 1; j += 1;
-    } else if (table[i + 1][j] >= table[i][j + 1]) {
-      i += 1;
-    } else {
-      j += 1;
-    }
-  }
-  return { keptInput, keptOutput };
+    lines[lines.length - 1].push(word.innerHTML);
+  });
+  element.innerHTML = lines
+    .map((line, index) => `<span class="line" style="--line:${index}"><span>${line.join(' ')}</span></span>`)
+    .join('');
 };
 
-const editor = document.querySelector('[data-editor]');
-if (editor) {
-  const examples = [
-    { input: 'Lest keeP looknig.', output: "Let's keep looking." },
-    { input: "I dno't inda biiT.", output: "I don't mind a bit." },
-    { input: 'Itt sounnds sounnds dangerous.', output: 'It sounds dangerous.' },
-    { input: "I'll c to hte arrenemenst for tjhe pa rty.", output: "I'll see to the arrangements for the party." },
-    { input: 'luck turNed inmytaVor.', output: 'Luck turned in my favor.' }
-  ];
-  const inputEl = editor.querySelector('[data-editor-input]');
-  const outputEl = editor.querySelector('[data-editor-output]');
-  const statusEl = editor.querySelector('[data-editor-status]');
-  const editsEl = editor.querySelector('[data-editor-edits]');
-  const liveEl = editor.querySelector('[data-editor-live]');
-  const pager = editor.querySelector('[data-editor-pager]');
-
-  let run = 0;
-  let current = 0;
-  const sleep = (ms, token) => new Promise((resolve, reject) => {
-    setTimeout(() => (token === run ? resolve() : reject(new Error('cancelled'))), ms);
-  });
-  const setStatus = (label, state) => {
-    statusEl.textContent = label;
-    editor.dataset.state = state;
-  };
-  const wordSpans = (words, kept, className) => words.map((word, index) => {
-    const span = document.createElement('span');
-    span.className = kept.has(index) ? 'word' : `word ${className}`;
-    span.style.setProperty('--w', index);
-    span.textContent = word;
-    return span;
-  });
-  const fill = (element, spans) => {
-    element.replaceChildren();
-    spans.forEach((span, index) => {
-      if (index) element.append(' ');
-      element.append(span);
-    });
-  };
-
-  const dots = examples.map((_, index) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.setAttribute('aria-label', `Example ${index + 1}`);
-    dot.addEventListener('click', () => play(index));
-    pager.append(dot);
-    return dot;
-  });
-
-  const renderFinal = (example) => {
-    const inputWords = example.input.split(' ');
-    const outputWords = example.output.split(' ');
-    const { keptInput, keptOutput } = diffWords(inputWords, outputWords);
-    fill(inputEl, wordSpans(inputWords, keptInput, 'is-wrong'));
-    fill(outputEl, wordSpans(outputWords, keptOutput, 'is-fixed'));
-    editsEl.textContent = String(outputWords.length - keptOutput.size);
-    liveEl.textContent = `Input: ${example.input} Corrected: ${example.output}`;
-  };
-
-  async function play(index) {
-    run += 1;
-    const token = run;
-    current = index;
-    const example = examples[index];
-    dots.forEach((dot, dotIndex) => dot.setAttribute('aria-current', String(dotIndex === index)));
-
-    if (reducedMotion.matches) {
-      renderFinal(example);
-      setStatus('Corrected', 'done');
-      return;
-    }
-
-    try {
-      editor.classList.remove('is-scanning');
-      outputEl.replaceChildren();
-      inputEl.replaceChildren();
-      editsEl.textContent = '0';
-      setStatus('Typing…', 'typing');
-      const caret = document.createElement('span');
-      caret.className = 'caret';
-      const typed = document.createTextNode('');
-      inputEl.append(typed, caret);
-      for (const char of example.input) {
-        typed.data += char;
-        await sleep(38 + Math.random() * 55, token);
-      }
-      await sleep(380, token);
-
-      setStatus('Reading context', 'reading');
-      renderFinal(example);
-      outputEl.replaceChildren();
-      editor.classList.add('is-scanning');
-      await sleep(950, token);
-
-      setStatus('Corrected', 'done');
-      editor.classList.remove('is-scanning');
-      renderFinal(example);
-      await sleep(3600, token);
-      play((current + 1) % examples.length);
-    } catch {
-      // A newer run took over.
-    }
-  }
-
-  whenVisible([editor], () => play(0), { threshold: 0.3 });
-}
-
-/* ---------- Count-up numbers ---------- */
-
-const counters = [...document.querySelectorAll('[data-count]')];
-const formatCount = (value, decimals) => value.toLocaleString('en-US', {
-  minimumFractionDigits: decimals,
-  maximumFractionDigits: decimals
+const lineTargets = [...document.querySelectorAll('[data-lines]')];
+(document.fonts?.ready ?? Promise.resolve()).then(() => {
+  lineTargets.forEach(splitLines);
+  onceVisible(lineTargets, (element) => element.classList.add('is-in'));
 });
-counters.forEach((counter) => {
-  counter.textContent = formatCount(0, Number(counter.dataset.decimals || 0));
-});
-whenVisible(counters, (counter) => {
-  const target = Number(counter.dataset.count);
-  const decimals = Number(counter.dataset.decimals || 0);
-  if (reducedMotion.matches) {
-    counter.textContent = formatCount(target, decimals);
-    return;
-  }
-  const duration = 1600;
-  const start = performance.now();
-  const tick = (now) => {
-    const t = Math.min(1, (now - start) / duration);
-    const eased = 1 - Math.pow(1 - t, 4);
-    counter.textContent = formatCount(target * eased, decimals);
-    if (t < 1) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}, { threshold: 0.6 });
-
-/* ---------- Pointer spotlight on cards ---------- */
-
-document.querySelectorAll('[data-spotlight]').forEach((card) => {
-  card.addEventListener('pointermove', (event) => {
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-    card.style.setProperty('--my', `${event.clientY - rect.top}px`);
-  });
-});
-
-/* ---------- 900-outcome dot field ---------- */
-
-const dotField = document.querySelector('[data-dot-field]');
-if (dotField) {
-  const outcomes = [
-    ['exact', 629, 'exact match'],
-    ['improved', 157, 'improved, not exact'],
-    ['over', 72, 'overcorrected'],
-    ['neutral', 42, 'other outcomes']
-  ];
-  const columns = 30;
-  const fragment = document.createDocumentFragment();
-  let index = 0;
-  outcomes.forEach(([className, total]) => {
-    for (let n = 0; n < total; n += 1) {
-      const dot = document.createElement('i');
-      dot.className = className;
-      // diagonal wave: dots further from the top-left corner arrive later
-      dot.style.setProperty('--d', `${(Math.floor(index / columns) + (index % columns)) * 14}ms`);
-      fragment.appendChild(dot);
-      index += 1;
-    }
-  });
-  dotField.appendChild(fragment);
-
-  const panel = dotField.closest('.dot-panel');
-  const readout = panel.querySelector('[data-dot-readout]');
-  const buttons = [...document.querySelectorAll('[data-filter]')];
-  let locked = null;
-  const focus = (key) => {
-    panel.dataset.focus = key || '';
-    const match = outcomes.find(([className]) => className === key);
-    readout.textContent = match ? `${match[1]} ${match[2]} · ${(match[1] / 9).toFixed(1)}%` : 'All outcomes';
-    buttons.forEach((button) => button.classList.toggle('is-active', button.dataset.filter === key));
-  };
-  buttons.forEach((button) => {
-    const key = button.dataset.filter;
-    button.addEventListener('pointerenter', () => focus(key));
-    button.addEventListener('pointerleave', () => focus(locked));
-    button.addEventListener('focus', () => focus(key));
-    button.addEventListener('blur', () => focus(locked));
-    button.addEventListener('click', () => {
-      locked = locked === key ? null : key;
-      buttons.forEach((other) => other.setAttribute('aria-pressed', String(other.dataset.filter === locked)));
-      focus(locked ?? key);
-    });
-  });
-}
-
-/* ---------- Scramble-to-correct headline ---------- */
-
-const scrambles = [...document.querySelectorAll('[data-scramble]')];
-if (scrambles.length && !reducedMotion.matches) {
-  const glyphs = 'abcdefghijklmnopqrstuvwxyz';
-  const resolve = (element, delay) => {
-    const finalText = element.textContent;
-    const duration = 1100;
-    let start = null;
-    const tick = (now) => {
-      start ??= now + delay;
-      const progress = Math.max(0, Math.min(1, (now - start) / duration));
-      const settled = Math.floor(progress * finalText.length);
-      element.textContent = [...finalText].map((char, index) => {
-        if (index < settled || !/[a-z]/i.test(char)) return char;
-        return glyphs[Math.floor(Math.random() * glyphs.length)];
-      }).join('');
-      if (progress < 1) requestAnimationFrame(tick);
-      else element.textContent = finalText;
-    };
-    requestAnimationFrame(tick);
-  };
-  whenVisible(scrambles, (element) => resolve(element, scrambles.indexOf(element) * 350), { threshold: 0.6 });
-}
-
-/* ---------- Research: active table of contents ---------- */
-
-const tocLinks = [...document.querySelectorAll('[data-toc] a[href^="#"]')];
-if (tocLinks.length && 'IntersectionObserver' in window) {
-  const toc = tocLinks[0].closest('[data-toc]');
-  const byId = new Map(tocLinks.map((link) => [link.hash.slice(1), link]));
-  const observer = new IntersectionObserver((entries) => {
-    const visible = entries.filter((entry) => entry.isIntersecting)[0];
-    if (!visible) return;
-    const active = byId.get(visible.target.id);
-    tocLinks.forEach((link) => link.removeAttribute('aria-current'));
-    active?.setAttribute('aria-current', 'location');
-    toc.style.setProperty('--toc-progress', String((tocLinks.indexOf(active) + 1) / tocLinks.length));
-  }, { rootMargin: '-30% 0px -60% 0px' });
-  byId.forEach((_, id) => {
-    const section = document.getElementById(id);
-    if (section) observer.observe(section);
-  });
-}
+onceVisible([...document.querySelectorAll('[data-reveal]')], (element) => element.classList.add('is-in'));
+requestScroll();
