@@ -1,0 +1,33 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/site/index.html"
+    },
+    {
+      "source": "/research",
+      "destination": "/site/research.html"
+    },
+    {
+      "source": "/research.html",
+      "destination": "/site/research.html"
+    },
+    {
+      "source": "/styles.css",
+      "destination": "/site/styles.css"
+    },
+    {
+      "source": "/script.js",
+      "destination": "/site/script.js"
+    },
+    {
+      "source": "/favicon.svg",
+      "destination": "/site/favicon.svg"
+    }
+  ]
+}
