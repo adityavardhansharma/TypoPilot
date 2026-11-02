@@ -36,41 +36,49 @@
   </header>
 
   <main id="main">
-    <section class="hero shell" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="status-line"><span></span> Model research in active development</p>
-        <h1 id="hero-title">Autocorrect for the mistakes autocorrect can’t read.</h1>
-        <p class="hero-lede">TypoPilot uses sentence context to recover heavily mistyped English—locally, privately, and at useful laptop-CPU speed.</p>
-        <div class="hero-actions">
-          <a class="button button-dark" href="research.html">Read the research <span aria-hidden="true">↗</span></a>
-          <a class="text-link" href="#benchmarks">Explore benchmarks <span aria-hidden="true">↓</span></a>
-        </div>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-sky" aria-hidden="true">
+        <span class="hero-glow"></span>
+        <span class="keycap" style="--x:8%;--y:24%;--r:-14deg;--d:0s">hte</span>
+        <span class="keycap" style="--x:86%;--y:18%;--r:10deg;--d:-2s">teh</span>
+        <span class="keycap" style="--x:4%;--y:64%;--r:8deg;--d:-4s">⌫</span>
+        <span class="keycap" style="--x:91%;--y:58%;--r:-8deg;--d:-1s">recieve</span>
+        <span class="keycap" style="--x:78%;--y:84%;--r:6deg;--d:-3s">dno't</span>
       </div>
+      <div class="shell hero-inner">
+        <p class="eyebrow is-live" data-reveal>Local model research · in active development</p>
+        <h1 id="hero-title" class="hero-title" data-reveal style="--delay:90">Autocorrect for the mistakes autocorrect <em>can’t read.</em></h1>
+        <p class="hero-lede" data-reveal style="--delay:180">TypoPilot uses sentence context to recover heavily mistyped English — locally, privately, and at useful laptop-CPU speed.</p>
+        <div class="hero-actions" data-reveal style="--delay:270">
+          <a class="button" href="/research">Read the research <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="button button-ghost" href="#benchmarks">See the benchmarks <span aria-hidden="true">↓</span></a>
+        </div>
 
-      <div class="flight-board" data-flight-board aria-label="Animated example: TypoPilot corrects a heavily mistyped sentence as an aircraft passes over it">
-        <div class="flight-board-top">
-          <span>Correction route</span>
-          <span class="route-code">TP / LOCAL / 001</span>
-        </div>
-        <div class="flight-stage">
-          <div class="flight-grid" aria-hidden="true"></div>
-          <span class="stage-label stage-label-before">Uncorrected</span>
-          <span class="stage-label stage-label-after">Corrected</span>
-          <div class="sentence-stack" aria-hidden="true">
-            <p class="flight-sentence sentence-wrong" data-wrong>Lest keeP looknig.</p>
-            <p class="flight-sentence sentence-correct" data-correct>Let's keep looking.</p>
+        <figure class="editor" data-editor data-reveal style="--delay:380" aria-label="Live demonstration: a mistyped sentence is typed, read in context, and corrected">
+          <div class="editor-chrome">
+            <span class="editor-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="editor-title mono">typopilot · llama-3.2-1b · q4_k_m</span>
+            <span class="editor-status mono" data-editor-status>Ready</span>
           </div>
-          <div class="plane-track" aria-hidden="true">
-            <span class="plane-wake"></span>
-            <svg class="plane" viewBox="0 0 80 80" role="img" aria-label="">
-              <path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/>
-            </svg>
+          <div class="editor-body">
+            <span class="editor-scan" aria-hidden="true"></span>
+            <div class="editor-line is-input">
+              <span class="line-tag mono">Input</span>
+              <p class="editor-text" data-editor-input></p>
+            </div>
+            <div class="editor-line is-output">
+              <span class="line-tag mono">Output</span>
+              <p class="editor-text" data-editor-output></p>
+            </div>
           </div>
-        </div>
-        <div class="flight-board-bottom">
-          <span><i class="signal-dot"></i> On-device pass</span>
-          <span data-example-count>Example 1 / 4</span>
-        </div>
+          <figcaption class="editor-foot mono">
+            <span><b data-editor-edits>0</b> words repaired</span>
+            <span><b>344 ms</b> avg on CPU</span>
+            <span><b>0</b> bytes sent</span>
+            <span class="editor-pager" data-editor-pager role="group" aria-label="Choose example"></span>
+          </figcaption>
+          <p class="sr-only" aria-live="polite" data-editor-live></p>
+        </figure>
       </div>
     </section>
 
