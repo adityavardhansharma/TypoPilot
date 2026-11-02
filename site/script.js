@@ -1,91 +1,62 @@
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/* ---------- Header: menu, scrolled state, progress ---------- */
+
+const header = document.querySelector('[data-header]');
 const navToggle = document.querySelector('.nav-toggle');
-const siteNav = document.querySelector('.site-nav');
+const progressBar = document.querySelector('[data-scroll-progress]');
 
-if (navToggle && siteNav) {
-  const closeNav = () => {
-    navToggle.setAttribute('aria-expanded', 'false');
-    siteNav.classList.remove('is-open');
+if (header && navToggle) {
+  const setNav = (open) => {
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    header.classList.toggle('is-open', open);
   };
-
-  navToggle.addEventListener('click', () => {
-    const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', String(!isOpen));
-    siteNav.classList.toggle('is-open', !isOpen);
-  });
-  siteNav.addEventListener('click', (event) => {
-    if (event.target.closest('a')) closeNav();
+  navToggle.addEventListener('click', () => setNav(navToggle.getAttribute('aria-expanded') !== 'true'));
+  header.querySelector('.site-nav')?.addEventListener('click', (event) => {
+    if (event.target.closest('a')) setNav(false);
   });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeNav();
+    if (event.key === 'Escape') setNav(false);
   });
 }
 
-const flightBoard = document.querySelector('[data-flight-board]');
-if (flightBoard) {
-  const examples = [
-    { input: 'Lest keeP looknig.', output: "Let's keep looking." },
-    { input: "I dno't inda biiT.", output: "I don't mind a bit." },
-    { input: 'Itt sounnds sounnds dangerous.', output: 'It sounds dangerous.' },
-    { input: 'luck turNed inmytaVor.', output: 'Luck turned in my favor.' }
-  ];
-  const wrong = flightBoard.querySelector('[data-wrong]');
-  const correct = flightBoard.querySelector('[data-correct]');
-  const count = flightBoard.querySelector('[data-example-count]');
-  const plane = flightBoard.querySelector('.plane');
-  const track = flightBoard.querySelector('.plane-track');
-  let exampleIndex = 0;
+let scrollQueued = false;
+const onScroll = () => {
+  scrollQueued = false;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  header?.classList.toggle('is-scrolled', window.scrollY > 24);
+  progressBar?.style.setProperty('--progress', max > 0 ? (window.scrollY / max).toFixed(4) : '0');
+};
+window.addEventListener('scroll', () => {
+  if (!scrollQueued) {
+    scrollQueued = true;
+    requestAnimationFrame(onScroll);
+  }
+}, { passive: true });
+onScroll();
 
-  const sizeFlightPath = () => {
-    if (!track) return;
-    flightBoard.style.setProperty('--plane-travel', `${Math.max(250, track.clientWidth - 10)}px`);
-  };
-  const showExample = () => {
-    const example = examples[exampleIndex];
-    wrong.textContent = example.input;
-    correct.textContent = example.output;
-    count.textContent = `Example ${exampleIndex + 1} / ${examples.length}`;
-    flightBoard.setAttribute('aria-label', `Animated correction example. Input: ${example.input} Output: ${example.output}`);
-  };
+/* ---------- Scroll reveal ---------- */
 
-  plane?.addEventListener('animationiteration', () => {
-    exampleIndex = (exampleIndex + 1) % examples.length;
-    showExample();
-  });
-  window.addEventListener('resize', sizeFlightPath, { passive: true });
-  sizeFlightPath();
-  showExample();
-}
-
-const dotMatrix = document.querySelector('[data-dot-matrix]');
-if (dotMatrix) {
-  const outcomes = [
-    ['exact', 629],
-    ['improved', 157],
-    ['over', 72],
-    ['neutral', 42]
-  ];
-  const fragment = document.createDocumentFragment();
-  outcomes.forEach(([className, total]) => {
-    for (let index = 0; index < total; index += 1) {
-      const dot = document.createElement('i');
-      dot.className = className;
-      fragment.appendChild(dot);
-    }
-  });
-  dotMatrix.appendChild(fragment);
-}
-
-const researchLinks = [...document.querySelectorAll('.research-toc a[href^="#"]')];
-if (researchLinks.length && 'IntersectionObserver' in window) {
-  const byId = new Map(researchLinks.map((link) => [link.hash.slice(1), link]));
+const whenVisible = (elements, callback, options = {}) => {
+  if (!('IntersectionObserver' in window)) {
+    elements.forEach(callback);
+    return;
+  }
   const observer = new IntersectionObserver((entries) => {
-    const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (!visible) return;
-    researchLinks.forEach((link) => link.removeAttribute('aria-current'));
-    byId.get(visible.target.id)?.setAttribute('aria-current', 'location');
-  }, { rootMargin: '-18% 0px -68%', threshold: [0, 0.25, 0.6] });
-  byId.forEach((_, id) => {
-    const section = document.getElementById(id);
-    if (section) observer.observe(section);
-  });
-}
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      callback(entry.target);
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12, ...options });
+  elements.forEach((element) => observer.observe(element));
+};
+
+document.querySelectorAll('[data-stagger]').forEach((group) => {
+  [...group.children].forEach((child, index) => child.style.setProperty('--i', index));
+});
+document.documentElement.classList.add('js');
+whenVisible([...document.querySelectorAll('[data-reveal], [data-stagger]')], (element) => {
+  element.classList.add('is-visible');
+});
