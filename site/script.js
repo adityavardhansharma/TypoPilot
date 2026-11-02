@@ -148,7 +148,7 @@ const alignSegments = (from, to) => {
   return pieces;
 };
 
-const createFlight = (figure, examples, { loop = true, maxSize = 136, flightSeconds = 3.6, prefix = 'TP-1' } = {}) => {
+const createFlight = (figure, examples, { loop = true, maxSize = 136, flightSeconds = 3.6 } = {}) => {
   const stage = figure.querySelector('[data-flight-stage]');
   const line = figure.querySelector('[data-flight-line]');
   const plane = figure.querySelector('[data-flight-plane]');
@@ -156,6 +156,7 @@ const createFlight = (figure, examples, { loop = true, maxSize = 136, flightSeco
   const statusEl = figure.querySelector('[data-flight-status]');
   const editsEl = figure.querySelector('[data-flight-edits]');
   const numberEl = figure.querySelector('[data-flight-no]');
+  const timeEl = figure.querySelector('[data-flight-time]');
   const liveEl = figure.querySelector('[data-flight-live]');
   const pager = figure.querySelector('[data-flight-pager]');
 
@@ -243,7 +244,8 @@ const createFlight = (figure, examples, { loop = true, maxSize = 136, flightSeco
     trail.style.top = `${planeTop + planeWidth / 2}px`;
 
     const total = pieces.filter((piece) => !piece.keep).length;
-    if (numberEl) numberEl.textContent = `${prefix}${String(index + 1).padStart(2, '0')}`;
+    if (numberEl && example.ref) numberEl.textContent = example.ref;
+    if (timeEl && example.ms) timeEl.textContent = `${example.ms} ms`;
     if (editsEl) editsEl.textContent = `0 / ${total}`;
     pagerButtons.forEach((button, n) => button?.setAttribute('aria-current', String(n === index)));
     figure.setAttribute('aria-description', `Typed: ${example.input} Meant: ${example.output}`);
@@ -435,10 +437,139 @@ const createFlight = (figure, examples, { loop = true, maxSize = 136, flightSeco
 const heroFlight = document.querySelector('.hero [data-flight]');
 if (heroFlight) {
   (document.fonts?.ready ?? Promise.resolve()).then(() => createFlight(heroFlight, [
-    { input: 'Lest keeP looknig.', output: "Let's keep looking." },
-    { input: 'Itt sounnds sounnds dangerous.', output: 'It sounds dangerous.' },
-    { input: "I dno't inda biiT.", output: "I don't mind a bit." },
-    { input: 'luck turNed inmytaVor.', output: 'Luck turned in my favor.' },
-    { input: "I'll c to hte arrenemenst for tjhe pa rty.", output: "I'll see to the arrangements for the party." }
+    { ref: 'EXT-004', ms: 201, input: 'Lest keeP looknig.', output: "Let's keep looking." },
+    { ref: 'EXT-006', ms: 168, input: 'Itt sounnds sounnds dangerous.', output: 'It sounds dangerous.' },
+    { ref: 'EXT-001', ms: 282, input: "I dno't inda biiT.", output: "I don't mind a bit." },
+    { ref: 'EXT-002', ms: 234, input: 'luck turNed inmytaVor.', output: 'Luck turned in my favor.' },
+    { ref: 'EXT-005', ms: 357, input: "I'll c to hte arrenemenst for tjhe pa rty.", output: "I'll see to the arrangements for the party." }
   ]));
+}
+
+/* ==========================================================================
+   Arrivals board — split-flap display of real corrections
+   ========================================================================== */
+
+const board = document.querySelector('[data-board]');
+if (board) {
+  const pages = [
+    [
+      ['EXT-004', 201, 'Lest keeP looknig.', "Let's keep looking."],
+      ['EXT-016', 248, 'co me iw th me, wlil yoU?', 'Come with me, will you?'],
+      ['HVY-071', 305, 'I th ougjt Isw a guost.', 'I thought I saw a ghost.'],
+      ['EXT-017', 199, 'he 3ill soon Bevac k.', 'He will soon be back.'],
+      ['HVY-076', 244, "Thzt aplpe  ins't red.", "That apple isn't red."],
+      ['EXT-085', 284, "Rhat's awEsome, rgi ht?", "That's awesome, right?"],
+      ['HVY-028', 213, "Lt'sss jiust say yes.", "Let's just say yes."],
+      ['EXT-041', 171, 'She li kes oragnes,,', 'She likes oranges.']
+    ],
+    [
+      ['EXT-073', 363, 'das Drawa line frome A 5o B', 'Draw a line from A to B.'],
+      ['HVY-067', 247, 'hey,yiu know waht?', 'Hey, you know what?'],
+      ['EXT-094', 246, "We sti l n't Know.", "We still don't know."],
+      ['HVY-078', 277, 'WWh at he syas i true.', 'What he says is true.'],
+      ['HVY-058', 200, "Te don'bt really acre.", "They don't really care."],
+      ['EXT-039', 287, 'she isbad at sop sop rts', 'She is bad at sports.'],
+      ['HVY-057', 224, "it'ssad, ture.", "It's sad, but true."],
+      ['EXT-086', 206, 'He yielded otpre ss ure', 'He yielded to pressure.']
+    ]
+  ];
+  const CELLS = 24;
+  const STATUS_CELLS = 6;
+  const GLYPHS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const rowsEl = board.querySelector('[data-board-rows]');
+  const pageEl = board.querySelector('[data-board-page]');
+  const clockEl = board.querySelector('[data-board-clock]');
+
+  const makeFlaps = (count, className) => {
+    const wrap = document.createElement('span');
+    wrap.className = className;
+    wrap.setAttribute('aria-hidden', 'true');
+    const cells = Array.from({ length: count }, () => {
+      const cell = document.createElement('span');
+      cell.className = 'flap';
+      cell.textContent = ' ';
+      wrap.append(cell);
+      return cell;
+    });
+    return { wrap, cells };
+  };
+
+  const rows = pages[0].map(() => {
+    const li = document.createElement('li');
+    li.className = 'board-row';
+    const ref = document.createElement('span');
+    ref.className = 'b-ref';
+    const from = document.createElement('span');
+    from.className = 'b-from';
+    const to = makeFlaps(CELLS, 'b-to');
+    const time = document.createElement('span');
+    time.className = 'b-time';
+    const status = makeFlaps(STATUS_CELLS, 'b-status');
+    const label = document.createElement('span');
+    label.className = 'sr-only';
+    li.append(label, ref, from, to.wrap, time, status.wrap);
+    rowsEl.append(li);
+    return { li, ref, from, to: to.cells, time, status: status.cells, statusWrap: status.wrap, label };
+  });
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  // One mechanical flap: a short run of random glyphs, then the target.
+  const flipCell = async (cell, target, delay) => {
+    await sleep(delay);
+    if (cell.textContent === target) return;
+    const spins = reducedMotion.matches || target === ' ' ? 0 : 2 + Math.floor(Math.random() * 4);
+    for (let n = 0; n <= spins; n += 1) {
+      cell.textContent = n === spins ? target : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      if (!reducedMotion.matches) {
+        cell.classList.remove('is-flipping');
+        void cell.offsetWidth;
+        cell.classList.add('is-flipping');
+        await sleep(64);
+      }
+    }
+  };
+  const flipText = (cells, text, rowDelay) => {
+    const padded = [...text.padEnd(cells.length, ' ')].slice(0, cells.length);
+    return Promise.all(cells.map((cell, n) => flipCell(cell, padded[n], rowDelay + n * 18)));
+  };
+
+  const showPage = async (pageIndex) => {
+    const page = pages[pageIndex];
+    if (pageEl) pageEl.textContent = `Page ${pageIndex + 1} / ${pages.length}`;
+    // Departures: every row shows what was typed …
+    await Promise.all(rows.map((row, n) => {
+      const [ref, ms, input, output] = page[n];
+      row.li.classList.remove('is-landed');
+      row.ref.textContent = ref;
+      row.from.textContent = input;
+      row.time.textContent = `${ms} ms`;
+      row.label.textContent = `${ref}: typed “${input}”, corrected to “${output}” in ${ms} milliseconds.`;
+      return Promise.all([flipText(row.to, input, n * 70), flipText(row.status, 'EN RTE', n * 70)]);
+    }));
+    await sleep(reducedMotion.matches ? 0 : 900);
+    // … then lands, row by row, as the corrected sentence.
+    await Promise.all(rows.map(async (row, n) => {
+      const [, , , output] = page[n];
+      await Promise.all([flipText(row.to, output, n * 160), flipText(row.status, 'LANDED', n * 160 + 200)]);
+      row.li.classList.add('is-landed');
+    }));
+  };
+
+  const tickClock = () => {
+    if (!clockEl) return;
+    const now = new Date();
+    clockEl.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  };
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  onceVisible([board], async () => {
+    let pageIndex = 0;
+    for (;;) {
+      await showPage(pageIndex);
+      await sleep(6500);
+      pageIndex = (pageIndex + 1) % pages.length;
+    }
+  }, { threshold: 0.3 });
 }

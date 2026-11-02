@@ -17,7 +17,7 @@
   --chart: oklch(0.47 0.11 252);
   --chart-wash: oklch(0.47 0.11 252 / 0.09);
   --board: oklch(0.19 0.008 262);
-  --board-flap: oklch(0.235 0.008 262);
+  --board-flap: oklch(0.275 0.008 262);
   --board-text: oklch(0.93 0.012 90);
   --board-amber: oklch(0.84 0.15 80);
 
@@ -402,4 +402,91 @@ p { text-wrap: pretty; }
   .flight-label { display: none; }
   .flight-hint { display: none; }
   .flight-pager { margin-left: 0; width: 100%; }
+}
+
+/* ==========================================================================
+   Arrivals board
+   ========================================================================== */
+
+.board {
+  --cell: clamp(0.78rem, 0.55rem + 0.42vw, 1.02rem);
+  background: var(--board);
+  color: var(--board-text);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 oklch(1 0 0 / 0.06) inset, 0 40px 80px -40px oklch(0.2 0.014 262 / 0.55);
+  overflow: hidden;
+}
+.board-top, .board-head, .board-foot {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: 1rem clamp(1rem, 2.5vw, 1.75rem);
+  color: oklch(0.93 0.012 90 / 0.55);
+}
+.board-top { border-bottom: 1px solid oklch(1 0 0 / 0.08); }
+.board-title { color: var(--board-amber); }
+.board-title i { font-style: normal; opacity: 0.5; }
+.board-meta { display: flex; gap: 2rem; }
+.board-meta [data-board-clock] { color: var(--board-text); font-variant-numeric: tabular-nums; }
+
+.board-head, .board-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(10rem, 1fr) auto 4.5rem auto;
+  column-gap: clamp(1rem, 2vw, 2rem);
+  align-items: center;
+}
+.board-head { padding-block: 0.75rem; }
+.board-rows { padding: 0 clamp(1rem, 2.5vw, 1.75rem); }
+.board-row {
+  padding-block: 0.45rem;
+  border-top: 1px solid oklch(1 0 0 / 0.06);
+  font-family: var(--font-data);
+  font-size: var(--cell);
+}
+.b-ref { color: oklch(0.93 0.012 90 / 0.5); font-size: 0.8em; letter-spacing: 0.04em; }
+.b-from {
+  color: oklch(0.93 0.012 90 / 0.42);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-decoration: line-through oklch(0.645 0.215 38 / 0.6);
+  font-size: 0.85em;
+}
+.b-time { color: oklch(0.93 0.012 90 / 0.6); font-variant-numeric: tabular-nums; text-align: right; font-size: 0.85em; }
+.b-to, .b-status { display: flex; gap: 2px; }
+.flap {
+  position: relative;
+  display: grid; place-items: center;
+  width: 1.18em; height: 1.7em;
+  background: linear-gradient(var(--board-flap) 0 50%, oklch(0.25 0.008 262) 50%);
+  border-radius: 2px;
+  color: var(--board-text);
+  white-space: pre;
+  transform-origin: 50% 50%;
+}
+.flap::after {
+  /* the hinge */
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+  background: oklch(0 0 0 / 0.55);
+}
+.flap.is-flipping { animation: flap 64ms cubic-bezier(0.3, 0, 0.2, 1); }
+@keyframes flap {
+  from { transform: perspective(12em) rotateX(55deg); filter: brightness(1.5); }
+  to { transform: none; filter: none; }
+}
+.b-status .flap { color: oklch(0.93 0.012 90 / 0.5); transition: color 0.6s var(--ease); }
+.is-landed .b-status .flap { color: var(--board-amber); }
+
+.board-foot { border-top: 1px solid oklch(1 0 0 / 0.08); margin-top: 0.5rem; flex-wrap: wrap; }
+.board-link { color: var(--board-text); transition: color 0.3s; }
+.board-link:hover { color: var(--board-amber); }
+
+@media (max-width: 72rem) {
+  .board-head, .board-row { grid-template-columns: 4.5rem auto 4rem; }
+  .board-head span:nth-child(2), .b-from, .board-head span:nth-child(5), .b-status { display: none; }
+}
+@media (max-width: 40rem) {
+  .board { --cell: 0.7rem; margin-inline: calc(var(--gutter) * -1); border-radius: 0; }
+  .board-head, .board-row { grid-template-columns: auto; row-gap: 0.4rem; }
+  .board-head { display: none; }
+  .b-ref, .b-time { display: inline; }
+  .board-row { grid-template-areas: "ref" "to" "time"; }
+  .b-time { text-align: left; }
+  .flap { width: 1.1em; }
 }

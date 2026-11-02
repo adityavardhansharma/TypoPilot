@@ -53,8 +53,9 @@
           <span class="flight-scale" aria-hidden="true"></span>
         </div>
         <figcaption class="flight-strip data">
-          <span>Flt <b data-flight-no>TP-101</b></span>
+          <span>Ref <b data-flight-no>EXT-004</b></span>
           <span>Fixes <b data-flight-edits>0 / 0</b></span>
+          <span>CPU time <b data-flight-time>201 ms</b></span>
           <span>Status <b data-flight-status>Boarding</b></span>
           <span class="flight-hint">Drag the aircraft to scrub</span>
           <span class="flight-pager" data-flight-pager role="group" aria-label="Choose a sentence"></span>
@@ -62,7 +63,30 @@
         <p class="sr-only" aria-live="polite" data-flight-live></p>
       </figure>
     </section>
-    <!-- arrivals -->
+    <section class="section arrivals" id="arrivals" aria-labelledby="arrivals-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker data" data-reveal><b>01</b> Spellings</p>
+          <h2 id="arrivals-title" data-lines>Departed damaged. <em>Landed&nbsp;clean.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">Real exact-match outputs from the 900-example suite, with the measured CPU time for each. The misses are published too — every one of them.</p>
+        </div>
+
+        <div class="board" data-board data-reveal>
+          <div class="board-top data">
+            <span class="board-title">Arrivals <i>·</i> TypoPilot local</span>
+            <span class="board-meta"><span data-board-page>Page 1 / 2</span><span data-board-clock>--:--</span></span>
+          </div>
+          <div class="board-head data" aria-hidden="true">
+            <span>Ref</span><span>Departed as</span><span>Arrived as</span><span>Time</span><span>Status</span>
+          </div>
+          <ol class="board-rows" data-board-rows aria-live="off"></ol>
+          <div class="board-foot data">
+            <span>Selected exact matches · Ryzen 9 4900HS · Q4_K_M</span>
+            <a class="board-link" href="/reports/llama-q4-900-eval-annotated.html">Open all 900 outputs, misses included <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- figures -->
     <!-- method -->
     <!-- benchmarks -->
