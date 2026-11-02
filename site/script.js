@@ -193,3 +193,31 @@ if (editor) {
 
   whenVisible([editor], () => play(0), { threshold: 0.3 });
 }
+
+/* ---------- Count-up numbers ---------- */
+
+const counters = [...document.querySelectorAll('[data-count]')];
+const formatCount = (value, decimals) => value.toLocaleString('en-US', {
+  minimumFractionDigits: decimals,
+  maximumFractionDigits: decimals
+});
+counters.forEach((counter) => {
+  counter.textContent = formatCount(0, Number(counter.dataset.decimals || 0));
+});
+whenVisible(counters, (counter) => {
+  const target = Number(counter.dataset.count);
+  const decimals = Number(counter.dataset.decimals || 0);
+  if (reducedMotion.matches) {
+    counter.textContent = formatCount(target, decimals);
+    return;
+  }
+  const duration = 1600;
+  const start = performance.now();
+  const tick = (now) => {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 4);
+    counter.textContent = formatCount(target * eased, decimals);
+    if (t < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}, { threshold: 0.6 });

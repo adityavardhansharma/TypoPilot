@@ -82,14 +82,35 @@
       </div>
     </section>
 
-    <section class="proof-rail" aria-label="Selected evaluation results">
-      <div class="shell proof-rail-inner">
-        <div><strong>83.23%</strong><span>exact spelling accuracy</span></div>
-        <div><strong>83.4%</strong><span>relative CER reduction</span></div>
-        <div><strong>344 ms</strong><span>average short-input CPU time</span></div>
-        <div><strong>98.02%</strong><span>clean-text preservation</span></div>
+    <section class="metrics" aria-label="Selected evaluation results">
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track"><div><span><s>Lest</s><i>→</i>Let's</span><span><s>looknig</s><i>→</i>looking</span><span><s>hte</s><i>→</i>the</span><span><s>arrenemenst</s><i>→</i>arrangements</span><span><s>inmytaVor</s><i>→</i>in my favor</span><span><s>sounnds</s><i>→</i>sounds</span><span><s>dno't</s><i>→</i>don't</span><span><s>tjhe</s><i>→</i>the</span><span><s>pa rty</s><i>→</i>party</span><span><s>biiT</s><i>→</i>bit</span><span><s>Itt</s><i>→</i>It</span><span><s>inda</s><i>→</i>mind</span></div><div><span><s>Lest</s><i>→</i>Let's</span><span><s>looknig</s><i>→</i>looking</span><span><s>hte</s><i>→</i>the</span><span><s>arrenemenst</s><i>→</i>arrangements</span><span><s>inmytaVor</s><i>→</i>in my favor</span><span><s>sounnds</s><i>→</i>sounds</span><span><s>dno't</s><i>→</i>don't</span><span><s>tjhe</s><i>→</i>the</span><span><s>pa rty</s><i>→</i>party</span><span><s>biiT</s><i>→</i>bit</span><span><s>Itt</s><i>→</i>It</span><span><s>inda</s><i>→</i>mind</span></div></div>
       </div>
-      <p class="metric-scope shell">650-example spelling subset and Ryzen 9 4900HS CPU measurements. <a href="research.html#methodology">Read the methodology</a>.</p>
+      <div class="shell">
+        <dl class="metric-grid" data-stagger>
+          <div class="metric">
+            <dt>exact spelling accuracy</dt>
+            <dd><span data-count="83.23" data-decimals="2">83.23</span><small>%</small></dd>
+            <span class="meter" style="--v:83.23%" aria-hidden="true"><i></i></span>
+          </div>
+          <div class="metric">
+            <dt>relative CER reduction</dt>
+            <dd><span data-count="83.4" data-decimals="1">83.4</span><small>%</small></dd>
+            <span class="meter" style="--v:83.4%" aria-hidden="true"><i></i></span>
+          </div>
+          <div class="metric">
+            <dt>average short-input CPU time</dt>
+            <dd><span data-count="344" data-decimals="0">344</span><small>ms</small></dd>
+            <span class="meter" style="--v:34.4%" aria-hidden="true"><i></i></span>
+          </div>
+          <div class="metric">
+            <dt>clean-text preservation</dt>
+            <dd><span data-count="98.02" data-decimals="2">98.02</span><small>%</small></dd>
+            <span class="meter" style="--v:98.02%" aria-hidden="true"><i></i></span>
+          </div>
+        </dl>
+        <p class="metric-scope mono" data-reveal>650-example spelling subset · Ryzen 9 4900HS CPU · <a class="text-link" href="/research#methodology">Methodology ↗</a></p>
+      </div>
     </section>
 
     <section class="section shell" id="how-it-works" aria-labelledby="damage-title">
