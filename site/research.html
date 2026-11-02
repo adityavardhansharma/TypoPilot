@@ -37,33 +37,32 @@
 
   <main id="main">
     <section class="research-hero shell">
-      <div>
-        <p class="status-line"><span></span> Research record · updated 17 July 2026</p>
-        <h1>Every result.<br>Every trade-off.</h1>
-      </div>
-      <div class="research-hero-copy">
+      <p class="eyebrow is-live" data-reveal>Research record · updated 17 July 2026</p>
+      <h1 data-reveal style="--delay:90">Every result.<br><em>Every trade-off.</em></h1>
+      <div class="research-hero-copy" data-reveal style="--delay:180">
         <p>This is the complete record behind TypoPilot’s public claims: model choices, training decisions, evaluation results, latency, failure modes, and the limits of cross-system comparisons.</p>
         <div class="research-jump">
           <a href="#recommended-model">Recommended model</a>
           <a href="#evaluations">Evaluations</a>
           <a href="#limitations">Limitations</a>
+          <a href="#artifacts">Artifacts</a>
         </div>
       </div>
     </section>
 
-    <section class="research-summary" aria-label="Current model summary">
-      <div class="shell research-summary-grid">
-        <div><span>Recommended model</span><strong>Llama 3.2 1B + LoRA</strong><small>GGUF Q4_K_M</small></div>
-        <div><span>Core spelling exact</span><strong>83.23%</strong><small>541 / 650 examples</small></div>
-        <div><span>Full-suite exact</span><strong>69.89%</strong><small>629 / 900 examples</small></div>
-        <div><span>Typical short input</span><strong>344 ms</strong><small>average CPU inference</small></div>
-      </div>
+    <section class="research-summary shell" aria-label="Current model summary">
+      <dl class="summary-grid" data-stagger>
+        <div><dt class="mono">Recommended model</dt><dd>Llama 3.2 1B + LoRA</dd><small>GGUF Q4_K_M</small></div>
+        <div><dt class="mono">Core spelling exact</dt><dd><span data-count="83.23" data-decimals="2">83.23</span>%</dd><small>541 / 650 examples</small></div>
+        <div><dt class="mono">Full-suite exact</dt><dd><span data-count="69.89" data-decimals="2">69.89</span>%</dd><small>629 / 900 examples</small></div>
+        <div><dt class="mono">Typical short input</dt><dd><span data-count="344" data-decimals="0">344</span> ms</dd><small>average CPU inference</small></div>
+      </dl>
     </section>
 
     <div class="research-shell shell">
       <aside class="research-sidebar" aria-label="Research contents">
-        <p>Contents</p>
-        <nav>
+        <p class="mono">Contents</p>
+        <nav data-toc>
           <a href="#recommended-model">Recommended model</a>
           <a href="#model-history">Model history</a>
           <a href="#evaluations">Evaluations</a>
@@ -76,7 +75,7 @@
       </aside>
 
       <article class="research-article">
-        <section id="recommended-model" class="research-section">
+        <section data-reveal id="recommended-model" class="research-section">
           <div class="research-heading">
             <span>Current recommendation</span>
             <h2>A small contextual model, tuned to correct, not rewrite.</h2>
@@ -96,12 +95,12 @@
           </div>
         </section>
 
-        <section id="model-history" class="research-section">
+        <section data-reveal id="model-history" class="research-section">
           <div class="research-heading">
             <span>Model history</span>
             <h2>What we trained, and what each experiment taught us.</h2>
           </div>
-          <div class="research-timeline">
+          <div class="research-timeline" data-stagger>
             <article>
               <span>Baseline</span><h3>Identity, rules, SymSpell</h3>
               <p>Established the “do nothing” floor and exposed the cost of dictionary-only correction. SymSpell changed 44% of cases incorrectly in the early suite.</p>
@@ -121,7 +120,7 @@
           </div>
         </section>
 
-        <section id="evaluations" class="research-section">
+        <section data-reveal id="evaluations" class="research-section">
           <div class="research-heading">
             <span>Evaluation</span>
             <h2>Three views of quality, kept separate.</h2>
@@ -180,7 +179,7 @@
           </div>
         </section>
 
-        <section id="latency" class="research-section">
+        <section data-reveal id="latency" class="research-section">
           <div class="research-heading">
             <span>Native CPU performance</span>
             <h2>Quantisation changed the product equation.</h2>
@@ -199,13 +198,13 @@
           <p class="table-caption">AMD Ryzen 9 4900HS, 8 cores / 16 threads, AVX2. Greedy decoding with cached instruction prefix. Medians of three complete runs.</p>
         </section>
 
-        <section id="comparisons" class="research-section">
+        <section data-reveal id="comparisons" class="research-section">
           <div class="research-heading">
             <span>Published comparison</span>
             <h2>Competitive evidence, without inventing a shared leaderboard.</h2>
           </div>
           <p>On its own spelling suite, TypoPilot’s 95.70% word-accuracy proxy is numerically above systems reported by the LREC 2020 comparison. The datasets and scorers differ, so TypoPilot remains officially unranked until it runs on the paper’s exact test inputs.</p>
-          <div class="published-ranking">
+          <div class="published-ranking" data-stagger>
             <div><span>1</span><strong>Transformer</strong><i>93.79% word accuracy</i></div>
             <div><span>2</span><strong>LSTM</strong><i>93.00%</i></div>
             <div><span>3</span><strong>BingSpell</strong><i>92.17%</i></div>
@@ -216,12 +215,12 @@
           <p class="source-note">Source: <a href="https://aclanthology.org/2020.lrec-1.228/">Näther, LREC 2020</a>. Apple publishes no absolute CER, WER, or false-correction benchmark for its current autocorrect, so it cannot be placed responsibly.</p>
         </section>
 
-        <section id="limitations" class="research-section limitations-section">
+        <section data-reveal id="limitations" class="research-section limitations-section">
           <div class="research-heading">
             <span>Limitations</span>
             <h2>What still breaks, and what we should train next.</h2>
           </div>
-          <div class="limitations-list">
+          <div class="limitations-list" data-stagger>
             <article><h3>Real-world C4 errors</h3><p>Exact match falls to 10.67% and overcorrection rises to 31.33%. These examples differ sharply from the synthetic training distribution.</p></article>
             <article><h3>Extreme segmentation</h3><p>The public split/concatenation sample reaches only 50.14% exact, showing that letter-by-letter splits and merged spans need dedicated training.</p></article>
             <article><h3>Grammar is intentionally conservative</h3><p>The model was optimized primarily for spelling and minimal edits. It may preserve awkward grammar rather than rewrite professional or personal voice.</p></article>
@@ -231,7 +230,7 @@
           </div>
         </section>
 
-        <section id="methodology" class="research-section">
+        <section data-reveal id="methodology" class="research-section">
           <div class="research-heading">
             <span>Methodology</span>
             <h2>How to read the numbers.</h2>
@@ -246,12 +245,12 @@
           </dl>
         </section>
 
-        <section id="artifacts" class="research-section artifacts-section">
+        <section data-reveal id="artifacts" class="research-section artifacts-section">
           <div class="research-heading">
             <span>Reproducibility</span>
             <h2>Open the evidence.</h2>
           </div>
-          <div class="artifact-links">
+          <div class="artifact-links" data-stagger>
             <a href="/reports/llama-q4-900-eval-annotated.html"><span>Annotated evaluation</span><strong>All 900 outputs</strong><i>HTML ↗</i></a>
             <a href="/reports/llama-variant-comparison.json"><span>Model variants</span><strong>F16, Q8, Q4 and base</strong><i>JSON ↗</i></a>
             <a href="/reports/llama-cpu-harness-benchmark.json"><span>Native performance</span><strong>CPU benchmark record</strong><i>JSON ↗</i></a>

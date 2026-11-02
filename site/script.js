@@ -305,3 +305,23 @@ if (scrambles.length && !reducedMotion.matches) {
   };
   whenVisible(scrambles, (element) => resolve(element, scrambles.indexOf(element) * 350), { threshold: 0.6 });
 }
+
+/* ---------- Research: active table of contents ---------- */
+
+const tocLinks = [...document.querySelectorAll('[data-toc] a[href^="#"]')];
+if (tocLinks.length && 'IntersectionObserver' in window) {
+  const toc = tocLinks[0].closest('[data-toc]');
+  const byId = new Map(tocLinks.map((link) => [link.hash.slice(1), link]));
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries.filter((entry) => entry.isIntersecting)[0];
+    if (!visible) return;
+    const active = byId.get(visible.target.id);
+    tocLinks.forEach((link) => link.removeAttribute('aria-current'));
+    active?.setAttribute('aria-current', 'location');
+    toc.style.setProperty('--toc-progress', String((tocLinks.indexOf(active) + 1) / tocLinks.length));
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  byId.forEach((_, id) => {
+    const section = document.getElementById(id);
+    if (section) observer.observe(section);
+  });
+}
