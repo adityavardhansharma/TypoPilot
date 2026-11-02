@@ -163,45 +163,66 @@
       </div>
     </section>
 
-    <section class="section section-tint" id="benchmarks" aria-labelledby="speed-title">
+    <section class="section benchmarks" id="benchmarks" aria-labelledby="speed-title">
       <div class="shell">
-        <div class="section-intro benchmark-intro">
-          <div>
-            <p class="claim-tag">Same model · same eight inputs · same CPU</p>
-            <h2 id="speed-title">The fastest fine-tuned variant kept every clean output.</h2>
+        <div class="section-head is-split">
+          <div data-reveal>
+            <p class="eyebrow">Same model · same eight inputs · same CPU</p>
+            <h2 id="speed-title">The fastest variant kept <em>every</em> clean output.</h2>
           </div>
-          <p>Quantising to Q4_K_M cut sentence latency and model size without losing a correct output in the manual comparison.</p>
+          <p data-reveal style="--delay:120">Quantising to Q4_K_M cut sentence latency and model size without losing a correct output in the manual comparison.</p>
         </div>
 
-        <div class="benchmark-layout">
-          <div class="rank-callout">
-            <span class="rank-number">#1</span>
-            <p>for latency among the three fine-tuned variants tested</p>
-            <strong>444 ms</strong>
-            <small>mean across seven sentences</small>
+        <div class="bench-grid">
+          <div class="race panel" data-race data-reveal role="img" aria-label="Mean sentence latency: Q4_K_M 444 milliseconds, Q8 696 milliseconds, F16 1,118 milliseconds">
+            <div class="race-head mono"><span>Mean sentence latency</span><span>lower is better</span></div>
+            <div class="race-lanes">
+              <div class="lane is-winner" style="--n:0.37">
+                <span class="lane-name mono">Q4_K_M</span>
+                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
+                <strong class="mono">444<small> ms</small></strong>
+              </div>
+              <div class="lane" style="--n:0.58">
+                <span class="lane-name mono">Q8</span>
+                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
+                <strong class="mono">696<small> ms</small></strong>
+              </div>
+              <div class="lane" style="--n:0.932">
+                <span class="lane-name mono">F16</span>
+                <span class="lane-track"><i><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></i></span>
+                <strong class="mono">1,118<small> ms</small></strong>
+              </div>
+            </div>
+            <div class="race-axis mono" aria-hidden="true"><span>0</span><span>400</span><span>800</span><span>1,200 ms</span></div>
+            <p class="race-note">Medians of three complete native CPU runs.</p>
           </div>
-          <div class="bar-chart" role="img" aria-label="Mean sentence latency: Q4_K_M 444 milliseconds, Q8 696 milliseconds, F16 1118 milliseconds">
-            <div class="chart-axis"><span>0 ms</span><span>1,200 ms</span></div>
-            <div class="bar-row winner">
-              <span class="bar-rank">1</span><span class="bar-name">Q4_K_M</span>
-              <span class="bar-track"><i style="--bar:39.7%"></i></span><strong>444</strong>
-            </div>
-            <div class="bar-row">
-              <span class="bar-rank">2</span><span class="bar-name">Q8</span>
-              <span class="bar-track"><i style="--bar:62.3%"></i></span><strong>696</strong>
-            </div>
-            <div class="bar-row">
-              <span class="bar-rank">3</span><span class="bar-name">F16</span>
-              <span class="bar-track"><i style="--bar:100%"></i></span><strong>1,118</strong>
-            </div>
-            <p class="chart-note">Milliseconds, lower is better. Medians of three complete native CPU runs.</p>
+
+          <div class="champion" data-reveal style="--delay:150">
+            <span class="champion-rank mono">#1</span>
+            <p class="champion-figure"><span data-count="444" data-decimals="0">444</span><small>ms</small></p>
+            <p>Fastest of the three fine-tuned variants tested — mean across seven sentences.</p>
           </div>
         </div>
 
-        <div class="benchmark-facts">
-          <div><span>Model size</span><strong>770.3 MB</strong><small>67% smaller than F16</small></div>
-          <div><span>Clean outputs</span><strong>8 / 8</strong><small>sentences + paragraph</small></div>
-          <div><span>Peak memory</span><strong>1.30 GB</strong><small>native working set</small></div>
+        <div class="fact-grid" data-stagger>
+          <div class="fact panel" data-spotlight>
+            <span class="fact-label mono">Model size</span>
+            <strong>770.3 MB</strong>
+            <div class="size-compare" aria-hidden="true"><i style="--s:1"></i><i style="--s:0.533"></i><i class="is-active" style="--s:0.326"></i></div>
+            <small>67% smaller than F16</small>
+          </div>
+          <div class="fact panel" data-spotlight>
+            <span class="fact-label mono">Clean outputs</span>
+            <strong>8 / 8</strong>
+            <div class="lit-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <small>sentences + paragraph</small>
+          </div>
+          <div class="fact panel" data-spotlight>
+            <span class="fact-label mono">Peak memory</span>
+            <strong>1.30 GB</strong>
+            <div class="mem-gauge" aria-hidden="true"><i></i></div>
+            <small>native working set</small>
+          </div>
         </div>
       </div>
     </section>
