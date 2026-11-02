@@ -278,39 +278,53 @@
       </div>
     </section>
 
-    <section class="section shell research-teaser" aria-labelledby="research-title">
-      <div>
-        <p class="claim-tag">Research, designed to be read</p>
-        <h2 id="research-title">Every model. Every trade-off. Every limitation.</h2>
+    <section class="section research-teaser" aria-labelledby="research-title">
+      <div class="shell">
+        <div class="section-head is-split">
+          <div data-reveal>
+            <p class="eyebrow">Research, designed to be read</p>
+            <h2 id="research-title">Every model. Every trade-off. <em>Every</em> limitation.</h2>
+          </div>
+          <div class="teaser-route" data-reveal style="--delay:120">
+            <p>Follow the project from rule-based baselines through ByT5 experiments to the final fine-tuned and quantised Llama model.</p>
+            <a class="button button-ghost" href="/research">Open the research <span class="arrow" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <ol class="lineage" data-stagger aria-label="Model research timeline">
+          <li><span class="mono">Baseline</span><strong>Rules + SymSpell</strong><small>44% overcorrection exposed the gap.</small></li>
+          <li><span class="mono">Byte-level</span><strong>ByT5-small</strong><small>Promising spelling, inconsistent grammar.</small></li>
+          <li><span class="mono">Contextual</span><strong>Llama 3.2 1B + LoRA</strong><small>Correction-only behaviour learned.</small></li>
+          <li><span class="mono">Final runtime</span><strong>Q4_K_M</strong><small>Best measured quality–speed balance.</small></li>
+        </ol>
       </div>
-      <div class="research-route">
-        <p>Follow the project from rule-based baselines through ByT5 experiments to the final fine-tuned and quantised Llama model.</p>
-        <a class="button button-dark" href="research.html">Open the Research page <span aria-hidden="true">↗</span></a>
-      </div>
-      <ol class="model-lineage" aria-label="Model research timeline">
-        <li><span>Baseline</span><strong>Rules + SymSpell</strong><small>44% overcorrection exposed the gap.</small></li>
-        <li><span>Byte-level</span><strong>ByT5-small</strong><small>Promising spelling, inconsistent grammar.</small></li>
-        <li><span>Contextual</span><strong>Llama 3.2 1B + LoRA</strong><small>Correction-only behaviour learned.</small></li>
-        <li><span>Final runtime</span><strong>Q4_K_M</strong><small>Best measured quality–speed balance.</small></li>
-      </ol>
     </section>
 
-    <section class="closing-cta shell" aria-labelledby="closing-title">
-      <div class="closing-dots" aria-hidden="true"></div>
-      <p>TypoPilot</p>
-      <h2 id="closing-title">Type fast.<br>We’ll read through it.</h2>
-      <a href="research.html">Read how the model was built <span aria-hidden="true">→</span></a>
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="shell closing-inner">
+        <span class="closing-mark" aria-hidden="true"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span>
+        <h2 id="closing-title" aria-label="Type fast. We’ll read through it."><span data-scramble aria-hidden="true">Type fast.</span><br><em data-scramble aria-hidden="true">We’ll read through it.</em></h2>
+        <div class="hero-actions">
+          <a class="button" href="/research">Read how it was built <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="button button-ghost" href="https://github.com/adityavardhansharma/TypoPilot">View source</a>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer class="site-footer shell">
-    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">✦</span><span>TypoPilot</span></a>
-    <p>A local noisy-text correction research project.</p>
-    <nav aria-label="Footer navigation">
-      <a href="research.html">Research</a>
-      <a href="/reports/llama-q4-900-eval-annotated.html">900 outputs</a>
-      <a href="https://github.com/adityavardhansharma/TypoPilot">GitHub</a>
-    </nav>
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div class="footer-top">
+        <a class="brand" href="/"><span class="brand-mark"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span>TypoPilot</span></a>
+        <p>A local noisy-text correction research project.</p>
+        <nav aria-label="Footer navigation">
+          <a href="/">Home</a>
+          <a href="/research">Research</a>
+          <a href="/reports/llama-q4-900-eval-annotated.html">900 outputs</a>
+          <a href="https://github.com/adityavardhansharma/TypoPilot">GitHub ↗</a>
+        </nav>
+      </div>
+      <p class="footer-word" aria-hidden="true">TypoPilot</p>
+    </div>
   </footer>
 </body>
 </html>

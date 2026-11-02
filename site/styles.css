@@ -965,3 +965,98 @@ html:not(.js) .swap-after { opacity: 1; transform: none; }
     0% { top: 0; opacity: 0; } 15%, 85% { opacity: 1; } 100% { top: calc(100% - 7px); opacity: 0; }
   }
 }
+
+/* ==========================================================================
+   Research teaser — lineage
+   ========================================================================== */
+
+.teaser-route { display: grid; gap: var(--space-lg); justify-items: start; color: var(--text-soft); font-size: var(--text-lead); }
+.research-teaser h2 { margin-top: var(--space-md); }
+.lineage {
+  position: relative;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-md);
+  padding-top: 2.5rem;
+}
+.lineage::before, .lineage::after {
+  content: ""; position: absolute; top: 0.45rem; left: 0; right: 0; height: 1px;
+  background: var(--line-strong);
+}
+.lineage::after {
+  background: linear-gradient(90deg, var(--sky), var(--lime));
+  transform-origin: left; transform: scaleX(0);
+  transition: transform 1.8s var(--ease-out) 0.2s;
+}
+.lineage.is-visible::after { transform: none; }
+.lineage li {
+  position: relative; display: grid; gap: 0.45rem; align-content: start;
+  padding: 1.4rem; border-radius: var(--radius-lg);
+  border: 1px solid var(--line); background: var(--panel);
+  transition: border-color 0.3s, transform 0.5s var(--ease-out);
+}
+.lineage li::before {
+  content: ""; position: absolute; top: -2.5rem; left: 1.4rem;
+  width: 0.95rem; height: 0.95rem; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--line-strong);
+  transition: border-color 0.4s, background-color 0.4s;
+  transition-delay: calc(var(--i) * 400ms + 300ms);
+}
+.lineage.is-visible li::before { border-color: var(--sky); }
+.lineage.is-visible li:last-child::before { border-color: var(--lime); background: var(--lime); box-shadow: 0 0 0 6px var(--lime-glow); }
+.lineage li:hover { transform: translateY(-4px); border-color: var(--line-strong); }
+.lineage span { font-size: var(--text-xs); color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+.lineage strong { font-size: 1.2rem; font-weight: 560; letter-spacing: -0.02em; }
+.lineage small { color: var(--text-soft); font-size: 0.92rem; }
+.lineage li:last-child { border-color: oklch(0.9 0.19 128 / 0.4); background: linear-gradient(160deg, oklch(0.9 0.19 128 / 0.1), var(--panel)); }
+.lineage li:last-child strong { color: var(--lime); }
+
+/* ==========================================================================
+   Closing call to action
+   ========================================================================== */
+
+.closing {
+  position: relative; overflow: hidden;
+  padding-block: clamp(6rem, 14vw, 11rem);
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: radial-gradient(ellipse 60% 70% at 50% 100%, oklch(0.9 0.19 128 / 0.14), transparent 70%);
+}
+.closing-inner { display: grid; justify-items: center; gap: var(--space-xl); }
+.closing-mark {
+  display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1.2rem;
+  background: var(--lime); color: var(--bg);
+  animation: float 5s ease-in-out infinite;
+  box-shadow: 0 20px 60px -10px oklch(0.9 0.19 128 / 0.5);
+}
+.closing-mark svg { width: 2.2rem; fill: currentColor; transform: rotate(45deg); }
+.closing h2 { font-size: clamp(3rem, 9vw, 8rem); letter-spacing: -0.055em; line-height: 0.95; }
+.closing h2 em { color: var(--lime); }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer { border-top: 1px solid var(--line); padding-top: var(--space-2xl); overflow: hidden; }
+.footer-top {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-lg);
+}
+.footer-top p { color: var(--muted); }
+.footer-top nav { display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; }
+.footer-top nav a { color: var(--text-soft); transition: color 0.2s; }
+.footer-top nav a:hover { color: var(--lime); }
+.footer-word {
+  margin-top: var(--space-xl);
+  font-size: clamp(4.5rem, 19vw, 17rem); font-weight: 640; letter-spacing: -0.07em; line-height: 0.78;
+  text-align: center;
+  background: linear-gradient(180deg, oklch(1 0 0 / 0.12), transparent 85%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  user-select: none;
+  translate: 0 0.12em;
+}
+
+@media (max-width: 60rem) {
+  .lineage { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 0; }
+  .lineage::before, .lineage::after, .lineage li::before { display: none; }
+}
+@media (max-width: 34rem) {
+  .lineage { grid-template-columns: 1fr; }
+}

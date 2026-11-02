@@ -280,3 +280,28 @@ if (dotField) {
     });
   });
 }
+
+/* ---------- Scramble-to-correct headline ---------- */
+
+const scrambles = [...document.querySelectorAll('[data-scramble]')];
+if (scrambles.length && !reducedMotion.matches) {
+  const glyphs = 'abcdefghijklmnopqrstuvwxyz';
+  const resolve = (element, delay) => {
+    const finalText = element.textContent;
+    const duration = 1100;
+    let start = null;
+    const tick = (now) => {
+      start ??= now + delay;
+      const progress = Math.max(0, Math.min(1, (now - start) / duration));
+      const settled = Math.floor(progress * finalText.length);
+      element.textContent = [...finalText].map((char, index) => {
+        if (index < settled || !/[a-z]/i.test(char)) return char;
+        return glyphs[Math.floor(Math.random() * glyphs.length)];
+      }).join('');
+      if (progress < 1) requestAnimationFrame(tick);
+      else element.textContent = finalText;
+    };
+    requestAnimationFrame(tick);
+  };
+  whenVisible(scrambles, (element) => resolve(element, scrambles.indexOf(element) * 350), { threshold: 0.6 });
+}
