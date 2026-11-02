@@ -30,7 +30,7 @@
   --step-1: clamp(1.2rem, 1.1rem + 0.4vw, 1.4rem);
   --step-2: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
   --step-3: clamp(2.4rem, 1.6rem + 3vw, 4.4rem);
-  --step-4: clamp(3rem, 1.6rem + 5.6vw, 6.8rem);
+  --step-4: clamp(2.8rem, 1.4rem + 4.8vw, 6rem);
 
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --wrap: 84rem;
@@ -71,8 +71,9 @@ h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; }
 ol, ul { padding: 0; list-style: none; }
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 340;
-  font-optical-sizing: auto;
+  font-weight: 360;
+  /* Capped optical size keeps hairlines (the e crossbar!) legible at display sizes */
+  font-variation-settings: "opsz" 40;
   letter-spacing: -0.022em;
   line-height: 1.02;
   text-wrap: balance;
@@ -163,7 +164,7 @@ p { text-wrap: pretty; }
 .masthead-inner { display: flex; align-items: center; gap: 2rem; height: 4.25rem; }
 .wordmark {
   display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: var(--font-display); font-size: 1.35rem; font-weight: 420; letter-spacing: -0.02em;
+  font-family: var(--font-display); font-size: 1.35rem; font-weight: 450; letter-spacing: -0.02em;
 }
 .wordmark svg { width: 1.1rem; fill: var(--signal); transform: rotate(90deg); transition: transform 0.9s var(--ease); }
 .wordmark:hover svg { transform: rotate(90deg) translateY(-3px); }
@@ -249,4 +250,156 @@ p { text-wrap: pretty; }
     animation-iteration-count: 1 !important;
   }
   .js [data-reveal], .js [data-lines] .line > span { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.hero { padding-top: clamp(2rem, 5vw, 4rem); }
+.hero-head {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter);
+}
+.hero-meta {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 0.5rem 2.5rem;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--rule-strong);
+  color: var(--ink-mute);
+}
+.hero-meta span:first-child { color: var(--signal); }
+.hero h1 {
+  grid-column: 1 / span 9;
+  margin-top: clamp(2rem, 5vw, 3.75rem);
+  font-size: var(--step-4);
+  font-weight: 350;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+}
+.hero h1 em { color: var(--signal); }
+.hero-side { grid-column: 10 / -1; align-self: end; display: grid; gap: 1.75rem; padding-bottom: 0.6rem; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; }
+
+/* ---------- Flight stage ---------- */
+
+.flight { margin-top: clamp(3rem, 7vw, 5.5rem); border-block: 1px solid var(--rule-strong); }
+.flight-stage {
+  position: relative;
+  padding: clamp(5rem, 11vw, 9rem) var(--gutter) clamp(3.5rem, 7vw, 5.5rem);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  background-image: radial-gradient(var(--rule-strong) 1px, transparent 1.3px);
+  background-size: 28px 28px;
+  background-position: center;
+}
+.flight-stage::before {
+  /* fade the chart grid toward the edges */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 70% 80% at 50% 50%, transparent 30%, var(--paper) 95%);
+}
+.is-dragging .flight-stage { cursor: grabbing; }
+.flight-label { position: absolute; top: 1.25rem; color: var(--ink-mute); z-index: 1; }
+.flight-label.is-dep { left: var(--gutter); }
+.flight-label.is-arr { right: var(--gutter); }
+.flight-scale {
+  position: absolute; left: var(--gutter); right: var(--gutter); bottom: 0; height: 10px;
+  background:
+    repeating-linear-gradient(90deg, var(--rule-strong) 0 1px, transparent 1px 10%) bottom / 100% 10px no-repeat,
+    repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 2%) bottom / 100% 5px no-repeat;
+}
+
+.flight-line {
+  position: relative; z-index: 1;
+  font-family: var(--font-display);
+  font-weight: 370;
+  font-variation-settings: "opsz" 40;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  white-space: pre;
+  transition: opacity 0.6s var(--ease), transform 0.9s var(--ease), filter 0.6s var(--ease);
+}
+.flight-line.is-leaving { opacity: 0; transform: translateY(-0.15em); filter: blur(8px); }
+.flight-line.is-entering { opacity: 0; transform: translateY(0.15em); filter: blur(8px); transition: none; }
+.flight-probe { position: absolute; visibility: hidden; white-space: pre; }
+.flight-line .run { color: var(--ink); }
+.flight-line .seg {
+  position: relative; display: inline-block; vertical-align: top;
+  height: 1.15em;
+  transition: width 0.8s var(--ease);
+}
+.flight-line .seg > span {
+  position: absolute; left: 0; top: 0; white-space: pre;
+  transition: opacity 0.5s var(--ease), transform 0.8s var(--ease), filter 0.6s var(--ease);
+}
+.flight-line .from {
+  color: var(--ink-mute);
+  text-decoration: underline wavy var(--signal);
+  text-decoration-thickness: max(1.5px, 0.025em);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 0.14em;
+}
+.flight-line .to { color: var(--ink); opacity: 0; transform: translateY(0.28em); filter: blur(6px); }
+.flight-line .to::after {
+  /* proof mark that stays under every repair */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0.08em; height: max(2px, 0.03em);
+  background: var(--signal);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.9s var(--ease) 0.15s;
+}
+.flight-line .is-fixed .from { opacity: 0; transform: translateY(-0.28em); filter: blur(6px); }
+.flight-line .is-fixed .to { opacity: 1; transform: none; filter: none; }
+.flight-line .is-fixed .to::after { transform: scaleX(1); }
+
+.flight-plane {
+  position: absolute; left: 0; z-index: 3;
+  aspect-ratio: 1;
+  will-change: transform;
+  touch-action: none;
+  cursor: inherit;
+}
+.flight-plane svg {
+  width: 100%; height: 100%;
+  fill: var(--signal);
+  filter: drop-shadow(-0.5rem 0.9rem 0.5rem oklch(0.2 0.014 262 / 0.16));
+}
+.flight-trail {
+  position: absolute; left: 0; z-index: 2; height: 0; pointer-events: none;
+  transition: opacity 1.2s var(--ease);
+}
+.flight-trail::before, .flight-trail::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(0.645 0.215 38 / 0.55) 75%, oklch(0.645 0.215 38 / 0.8));
+}
+.flight-trail::before { top: -5px; }
+.flight-trail::after { top: 4px; }
+.is-landed .flight-trail { opacity: 0; }
+
+.flight-strip {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 2.5rem;
+  padding: 1rem var(--gutter);
+  border-top: 1px solid var(--rule);
+  color: var(--ink-mute);
+}
+.flight-strip b { font-weight: 500; color: var(--ink); margin-left: 0.5rem; }
+.flight-hint { color: var(--signal); }
+.flight-pager { display: flex; gap: 0.25rem; margin-left: auto; }
+.flight-pager button {
+  padding: 0.35rem 0.5rem;
+  font: inherit; letter-spacing: inherit; color: var(--ink-mute);
+  background: linear-gradient(var(--signal), var(--signal)) 50% 100% / 0 1px no-repeat;
+  transition: color 0.4s, background-size 0.7s var(--ease);
+}
+.flight-pager button:hover { color: var(--ink); }
+.flight-pager button[aria-current="true"] { color: var(--ink); background-size: 100% 1px; }
+
+@media (max-width: 60rem) {
+  .hero h1 { grid-column: 1 / -1; }
+  .hero-side { grid-column: 1 / -1; margin-top: 2rem; max-width: 36rem; }
+}
+@media (max-width: 40rem) {
+  .flight-label { display: none; }
+  .flight-hint { display: none; }
+  .flight-pager { margin-left: 0; width: 100%; }
 }

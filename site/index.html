@@ -30,7 +30,38 @@
   </header>
 
   <main id="main">
-    <!-- hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-head">
+        <p class="hero-meta data" data-reveal><span>TP / Local / 001</span><span>Llama 3.2 1B · Q4_K_M</span><span>On-device · 344 ms avg</span></p>
+        <h1 id="hero-title" data-lines>Autocorrect for the mistakes autocorrect <em>can’t&nbsp;read.</em></h1>
+        <div class="hero-side" data-reveal style="--delay:350">
+          <p class="lede">TypoPilot reads the whole sentence, then repairs heavily mistyped English — locally, privately, at laptop-CPU speed.</p>
+          <div class="hero-actions">
+            <a class="button" href="/research">Read the research <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="link" href="#arrivals">See the spellings <span class="arrow" aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+      </div>
+
+      <figure class="flight" data-flight data-reveal style="--delay:500" aria-label="Interactive demonstration: an aircraft flies across a mistyped sentence and corrects it letter by letter. Drag the aircraft to scrub the correction.">
+        <div class="flight-stage" data-flight-stage>
+          <span class="flight-label is-dep data" aria-hidden="true">Dep · as typed</span>
+          <span class="flight-label is-arr data" aria-hidden="true">Arr · as meant</span>
+          <p class="flight-line" data-flight-line aria-hidden="true"></p>
+          <span class="flight-trail" data-flight-trail aria-hidden="true"></span>
+          <button class="flight-plane" type="button" data-flight-plane aria-label="Aircraft. Use left and right arrow keys to scrub the correction."><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></button>
+          <span class="flight-scale" aria-hidden="true"></span>
+        </div>
+        <figcaption class="flight-strip data">
+          <span>Flt <b data-flight-no>TP-101</b></span>
+          <span>Fixes <b data-flight-edits>0 / 0</b></span>
+          <span>Status <b data-flight-status>Boarding</b></span>
+          <span class="flight-hint">Drag the aircraft to scrub</span>
+          <span class="flight-pager" data-flight-pager role="group" aria-label="Choose a sentence"></span>
+        </figcaption>
+        <p class="sr-only" aria-live="polite" data-flight-live></p>
+      </figure>
+    </section>
     <!-- arrivals -->
     <!-- figures -->
     <!-- method -->
