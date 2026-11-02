@@ -221,3 +221,13 @@ whenVisible(counters, (counter) => {
   };
   requestAnimationFrame(tick);
 }, { threshold: 0.6 });
+
+/* ---------- Pointer spotlight on cards ---------- */
+
+document.querySelectorAll('[data-spotlight]').forEach((card) => {
+  card.addEventListener('pointermove', (event) => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+    card.style.setProperty('--my', `${event.clientY - rect.top}px`);
+  });
+});

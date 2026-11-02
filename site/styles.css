@@ -591,3 +591,103 @@ em, .serif {
   .metric-grid { grid-template-columns: 1fr; }
   .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
 }
+
+/* ==========================================================================
+   How it works — pipeline + bento
+   ========================================================================== */
+
+.pipeline {
+  position: relative;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  counter-reset: step;
+}
+.pipeline::before {
+  /* connecting rail with a travelling signal */
+  content: ""; position: absolute; top: 1.2rem; left: 2.6rem; right: 2.6rem; height: 1px;
+  background:
+    linear-gradient(90deg, transparent, var(--lime) 50%, transparent) 0 0 / 30% 100% no-repeat,
+    var(--line-strong);
+  animation: rail 3.6s linear infinite;
+}
+@keyframes rail {
+  from { background-position: -40% 0, 0 0; }
+  to { background-position: 140% 0, 0 0; }
+}
+.pipeline li { position: relative; display: grid; gap: 0.6rem; padding-right: var(--space-lg); }
+.pipeline .step {
+  display: grid; place-items: center;
+  width: 2.4rem; height: 2.4rem; margin-bottom: 0.6rem;
+  border-radius: 50%; border: 1px solid var(--line-strong);
+  background: var(--bg); font-size: var(--text-xs); color: var(--lime);
+}
+.pipeline h3 { font-size: 1.25rem; }
+.pipeline p { color: var(--text-soft); }
+
+.bento {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-md);
+}
+.bento-card {
+  --mx: 50%; --my: 0%;
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; gap: var(--space-lg);
+  padding: clamp(1.4rem, 2.5vw, 2rem);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  transition: border-color 0.4s, transform 0.6s var(--ease-out);
+}
+.bento-card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(28rem circle at var(--mx) var(--my), oklch(0.9 0.19 128 / 0.09), transparent 45%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.bento-card:hover { border-color: var(--line-strong); }
+.bento-card:hover::before { opacity: 1; }
+.bento-card.is-wide { grid-column: span 2; }
+.bento-card header { display: flex; justify-content: space-between; gap: var(--space-md); align-items: baseline; }
+.bento-kind { font-weight: 560; font-size: 1.1rem; letter-spacing: -0.02em; }
+.bento-tag { font-size: var(--text-xs); color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.bento-note { color: var(--muted); font-size: 0.92rem; margin-top: auto; }
+
+.swap { display: grid; gap: 0.7rem; }
+.swap p {
+  display: grid; grid-template-columns: 2.4rem 1fr; align-items: baseline;
+  font-size: clamp(1.1rem, 1.8vw, 1.45rem); line-height: 1.3; letter-spacing: -0.02em;
+}
+.is-wide .swap p { font-size: clamp(1.3rem, 2.6vw, 2.1rem); }
+.swap span { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.swap-before s {
+  color: var(--coral); text-decoration: none;
+  background: linear-gradient(var(--coral), var(--coral)) left 55% / 0 1.5px no-repeat;
+  transition: background-size 0.9s var(--ease-out) 0.5s, opacity 0.6s 1s;
+}
+.swap-after {
+  color: var(--lime);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.7s var(--ease-out) 1.1s, transform 0.7s var(--ease-out) 1.1s;
+}
+.is-visible .swap-before s { background-size: 100% 1.5px; opacity: 0.7; }
+.is-visible .swap-after { opacity: 1; transform: none; }
+.js .bento:not(.is-visible) .swap-after { opacity: 0; }
+html:not(.js) .swap-after { opacity: 1; transform: none; }
+
+.bento-stat { justify-content: space-between; background: linear-gradient(160deg, oklch(0.9 0.19 128 / 0.12), var(--panel) 55%); }
+.bento-figure {
+  display: flex; align-items: baseline; gap: 0.4rem;
+  font-size: clamp(3.5rem, 7vw, 5.5rem); font-weight: 520; letter-spacing: -0.06em; line-height: 1;
+  color: var(--lime); font-variant-numeric: tabular-nums;
+}
+.bento-figure small { font-size: 0.3em; color: var(--muted); letter-spacing: 0; }
+
+@media (max-width: 60rem) {
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 46rem) {
+  .pipeline { grid-template-columns: 1fr; gap: var(--space-xl); }
+  .pipeline::before { top: 1.2rem; bottom: 1.2rem; left: 1.2rem; right: auto; width: 1px; height: auto; background: var(--line-strong); animation: none; }
+  .pipeline li { padding-left: 3.6rem; }
+  .pipeline .step { position: absolute; left: 0; top: 0; }
+  .bento { grid-template-columns: 1fr; }
+  .bento-card.is-wide { grid-column: auto; }
+}

@@ -113,36 +113,53 @@
       </div>
     </section>
 
-    <section class="section shell" id="how-it-works" aria-labelledby="damage-title">
-      <div class="section-intro split-intro">
-        <h2 id="damage-title">Built for the sentence after the typo.</h2>
-        <p>Conventional checkers often solve one word at a time. TypoPilot reads the damage as a sentence, then makes the smallest correction it can justify.</p>
-      </div>
-      <div class="correction-ledger">
-        <article class="correction-row">
-          <div class="row-index" aria-hidden="true">→</div>
-          <div class="row-kind">Heavy keyboard damage</div>
-          <div class="row-example">
-            <p class="before"><span>Input</span> Itt sounnds sounnds dangerous.</p>
-            <p class="after"><span>Output</span> It sounds dangerous.</p>
+    <section class="section" id="how-it-works" aria-labelledby="how-title">
+      <div class="shell">
+        <div class="section-head is-split">
+          <div data-reveal>
+            <p class="eyebrow">How it works</p>
+            <h2 id="how-title">Reads the <em>sentence,</em> not the word.</h2>
           </div>
-        </article>
-        <article class="correction-row">
-          <div class="row-index" aria-hidden="true">→</div>
-          <div class="row-kind">Merged words</div>
-          <div class="row-example">
-            <p class="before"><span>Input</span> I'll c to hte arrenemenst for tjhe pa rty.</p>
-            <p class="after"><span>Output</span> I'll see to the arrangements for the party.</p>
-          </div>
-        </article>
-        <article class="correction-row">
-          <div class="row-index" aria-hidden="true">→</div>
-          <div class="row-kind">Meaning from context</div>
-          <div class="row-example">
-            <p class="before"><span>Input</span> luck turNed inmytaVor.</p>
-            <p class="after"><span>Output</span> Luck turned in my favor.</p>
-          </div>
-        </article>
+          <p data-reveal style="--delay:120">Conventional checkers often solve one word at a time. TypoPilot reads the damage as a sentence, then makes the smallest correction it can justify.</p>
+        </div>
+
+        <ol class="pipeline" data-stagger>
+          <li><span class="step mono">01</span><h3>Read the whole line</h3><p>The full sentence goes in, typos and all. No word is judged alone.</p></li>
+          <li><span class="step mono">02</span><h3>Infer the intent</h3><p>A fine-tuned 1B model uses the surrounding words to decide what you meant.</p></li>
+          <li><span class="step mono">03</span><h3>Edit minimally</h3><p>Only damaged words change. Clean text — and your voice — stay put.</p></li>
+        </ol>
+
+        <div class="bento" data-stagger>
+          <article class="bento-card is-wide" data-spotlight>
+            <header><span class="bento-kind">Heavy keyboard damage</span><span class="bento-tag mono">repeats · doubled keys</span></header>
+            <div class="swap">
+              <p class="swap-before"><span class="mono">in</span><s>Itt sounnds sounnds dangerous.</s></p>
+              <p class="swap-after"><span class="mono">out</span>It sounds dangerous.</p>
+            </div>
+            <p class="bento-note">Doubled letters and a stuttered word, resolved in one pass.</p>
+          </article>
+          <article class="bento-card " data-spotlight>
+            <header><span class="bento-kind">Merged &amp; split words</span><span class="bento-tag mono">segmentation</span></header>
+            <div class="swap">
+              <p class="swap-before"><span class="mono">in</span><s>I'll c to hte arrenemenst for tjhe pa rty.</s></p>
+              <p class="swap-after"><span class="mono">out</span>I'll see to the arrangements for the party.</p>
+            </div>
+            <p class="bento-note">Phonetic shorthand and a split word, rejoined by context.</p>
+          </article>
+          <article class="bento-card " data-spotlight>
+            <header><span class="bento-kind">Meaning from context</span><span class="bento-tag mono">intent</span></header>
+            <div class="swap">
+              <p class="swap-before"><span class="mono">in</span><s>luck turNed inmytaVor.</s></p>
+              <p class="swap-after"><span class="mono">out</span>Luck turned in my favor.</p>
+            </div>
+            <p class="bento-note">Three words fused together, with stray capitals.</p>
+          </article>
+          <article class="bento-card bento-stat" data-spotlight>
+            <span class="bento-kind">Restraint</span>
+            <p class="bento-figure"><span data-count="99" data-decimals="0">99</span><small>/ 101</small></p>
+            <p class="bento-note">already-correct examples left untouched in the 900-example suite.</p>
+          </article>
+        </div>
       </div>
     </section>
 
