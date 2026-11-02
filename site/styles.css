@@ -490,3 +490,133 @@ p { text-wrap: pretty; }
   .b-time { text-align: left; }
   .flap { width: 1.1em; }
 }
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+.figures { padding-bottom: 0; }
+.figures-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gutter); }
+.figure { display: flex; flex-direction: column; gap: 0.9rem; padding-top: 1.25rem; border-top: 1px solid var(--ink); }
+.figure dt { font-weight: 500; }
+.figure dd {
+  order: -1;
+  display: flex; align-items: baseline; gap: 0.15em;
+  font-family: var(--font-display); font-weight: 330; font-variation-settings: "opsz" 40;
+  font-size: clamp(3.2rem, 1.8rem + 3.6vw, 5.6rem);
+  letter-spacing: -0.045em; line-height: 0.9;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.figure dd small { font-size: 0.34em; letter-spacing: 0; color: var(--signal); font-weight: 400; }
+.figure p { color: var(--ink-soft); font-size: 0.95rem; max-width: 18rem; }
+.figures-note { margin-top: 2.5rem; color: var(--ink-mute); }
+.figures-note .link { text-transform: none; letter-spacing: 0; font-family: var(--font-text); font-size: 0.9rem; color: var(--ink); margin-left: 0.5rem; }
+
+@media (max-width: 60rem) { .figures-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 3rem; } }
+
+/* ==========================================================================
+   Method — sticky scroll sequence
+   ========================================================================== */
+
+.method { padding-bottom: 0; }
+.method-track { height: 320vh; position: relative; }
+.method-sticky {
+  position: sticky; top: 4.25rem;
+  height: calc(100vh - 4.25rem); height: calc(100svh - 4.25rem);
+  display: flex; align-items: center;
+}
+.method-grid {
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--gutter);
+  align-items: center;
+}
+.method-steps { display: grid; gap: 0.25rem; }
+.method-steps li {
+  display: grid; grid-template-columns: 2.5rem 1fr;
+  padding: 1.25rem 0; border-top: 1px solid var(--rule);
+  color: var(--ink-mute);
+  transition: color 0.8s var(--ease);
+}
+.method-steps li .data { padding-top: 0.35rem; }
+.method-steps h3 { transition: color 0.8s var(--ease); }
+.method-steps p {
+  font-size: 0.98rem; max-width: 26rem;
+  max-height: 0; margin-top: 0; overflow: hidden; opacity: 0;
+  transition: opacity 0.8s var(--ease), max-height 0.9s var(--ease), margin 0.9s var(--ease);
+}
+.method-steps li.is-active { color: var(--ink); border-top-color: var(--ink); }
+.method-steps li.is-active .data { color: var(--signal); }
+.method-steps li.is-active p { opacity: 1; max-height: 10rem; margin-top: 0.6rem; color: var(--ink-soft); }
+
+.method-figure {
+  position: relative;
+  padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 4vw, 3.5rem) clamp(3rem, 6vw, 4.5rem);
+  border: 1px solid var(--rule-strong);
+  background:
+    radial-gradient(var(--rule) 1px, transparent 1.3px) center / 22px 22px,
+    oklch(0.985 0.006 85);
+}
+.method-ref { position: absolute; top: 1.25rem; left: 1.5rem; color: var(--ink-mute); }
+.method-sentence {
+  position: relative; z-index: 1;
+  font-family: var(--font-display); font-weight: 370; font-variation-settings: "opsz" 40;
+  font-size: clamp(1.8rem, 1rem + 2.6vw, 3.4rem);
+  line-height: 1.35; letter-spacing: -0.025em;
+}
+.tok { display: inline-block; white-space: pre; transition: color 0.8s var(--ease), background-color 0.8s var(--ease); }
+.tok.is-bad {
+  position: relative; vertical-align: top; height: 1.35em;
+  transition: width 0.9s var(--ease), background-color 0.8s var(--ease);
+}
+.tok.is-bad > span {
+  position: absolute; left: 0; top: 0; white-space: pre;
+  transition: opacity 0.6s var(--ease), transform 0.9s var(--ease), filter 0.6s var(--ease);
+}
+.tok.is-measuring > span { position: static; }
+.tok .from {
+  color: var(--ink-mute);
+  text-decoration: underline wavy transparent;
+  text-decoration-thickness: max(1.5px, 0.03em);
+  text-underline-offset: 0.16em;
+  text-decoration-skip-ink: none;
+  transition: text-decoration-color 0.8s var(--ease), opacity 0.6s var(--ease), transform 0.9s var(--ease), filter 0.6s var(--ease);
+}
+.tok .to { opacity: 0; transform: translateY(0.3em); filter: blur(6px); }
+.tok .to::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0.1em; height: max(2px, 0.04em);
+  background: var(--signal); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.9s var(--ease) 0.2s;
+}
+
+[data-step="0"] .tok .from, [data-step="1"] .tok .from { text-decoration-color: var(--signal); }
+[data-step="1"] .tok:not(.is-bad) { color: var(--chart); }
+[data-step="1"] .tok[data-tok="c"] { background: var(--signal-wash); }
+[data-step="2"] .tok .from { opacity: 0; transform: translateY(-0.3em); filter: blur(6px); }
+[data-step="2"] .tok .to { opacity: 1; transform: none; filter: none; }
+[data-step="2"] .tok .to::after { transform: scaleX(1); }
+
+.method-arcs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.method-arcs path {
+  fill: none; stroke: var(--chart); stroke-width: 1.25;
+  stroke-dasharray: 1; stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.2s var(--ease-travel);
+  transition-delay: calc(var(--n) * 120ms);
+}
+.method-arcs circle { fill: var(--signal); opacity: 0; transition: opacity 0.6s; }
+[data-step="1"] .method-arcs path { stroke-dashoffset: 0; }
+[data-step="1"] .method-arcs circle { opacity: 1; }
+[data-step="2"] .method-arcs, [data-step="0"] .method-arcs { opacity: 0; transition: opacity 0.5s; }
+
+.method-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
+.method-progress i {
+  display: block; height: 100%; background: var(--signal);
+  transform-origin: left; transform: scaleX(var(--progress, 0));
+}
+
+@media (max-width: 60rem) {
+  .method-track { height: 280vh; }
+  .method-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .method-steps { order: 2; }
+  .method-steps li { display: none; border-top: 1px solid var(--ink); }
+  .method-steps li.is-active { display: grid; }
+  .method-figure { padding-top: 4rem; }
+}

@@ -573,3 +573,98 @@ if (board) {
     }
   }, { threshold: 0.3 });
 }
+
+/* ---------- Count-up figures (expo-out, no overshoot) ---------- */
+
+const counters = [...document.querySelectorAll('[data-count]')];
+const formatCount = (value, decimals) => value.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+if (!reducedMotion.matches) {
+  counters.forEach((counter) => { counter.textContent = formatCount(0, Number(counter.dataset.decimals || 0)); });
+}
+onceVisible(counters, (counter) => {
+  const target = Number(counter.dataset.count);
+  const decimals = Number(counter.dataset.decimals || 0);
+  if (reducedMotion.matches) return;
+  const start = performance.now();
+  const duration = 2000;
+  const tick = (now) => {
+    const t = clamp((now - start) / duration);
+    counter.textContent = formatCount(target * (1 - Math.pow(2, -10 * t)) / (1 - Math.pow(2, -10)), decimals);
+    if (t < 1) requestAnimationFrame(tick);
+    else counter.textContent = formatCount(target, decimals);
+  };
+  requestAnimationFrame(tick);
+}, { threshold: 0.5 });
+
+/* ---------- Method: scroll-driven read → context → edit ---------- */
+
+const method = document.querySelector('[data-method]');
+if (method) {
+  const figure = method.querySelector('[data-method-figure]');
+  const sentence = method.querySelector('[data-method-sentence]');
+  const arcs = method.querySelector('[data-method-arcs]');
+  const steps = [...method.querySelectorAll('[data-step]')];
+  const badTokens = [...sentence.querySelectorAll('.tok.is-bad')];
+  let currentStep = -1;
+
+  const measureToken = (token) => {
+    const from = token.querySelector('.from');
+    const to = token.querySelector('.to');
+    token.dataset.fromWidth = from.getBoundingClientRect().width;
+    token.dataset.toWidth = to.getBoundingClientRect().width;
+  };
+
+  const drawArcs = () => {
+    const box = figure.getBoundingClientRect();
+    arcs.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+    const point = (token) => {
+      const rect = token.getBoundingClientRect();
+      return [rect.left - box.left + rect.width / 2, rect.top - box.top + rect.height * 0.12];
+    };
+    const source = sentence.querySelector('[data-tok="c"]');
+    const targets = ['to', 'arrenemenst', 'pa rty.'].map((key) => [...sentence.querySelectorAll('.tok')].find((token) => (token.dataset.tok || token.textContent) === key));
+    const [sx, sy] = point(source);
+    arcs.innerHTML = targets.filter(Boolean).map((target, n) => {
+      const [tx, ty] = point(target);
+      const lift = Math.min(box.height * 0.32, 40 + Math.abs(tx - sx) * 0.28);
+      return `<path pathLength="1" style="--n:${n}" d="M${sx} ${sy} C ${sx} ${sy - lift}, ${tx} ${ty - lift}, ${tx} ${ty}"/>`;
+    }).join('') + `<circle cx="${sx}" cy="${sy}" r="4"/>`;
+  };
+
+  const layout = () => {
+    badTokens.forEach((token) => {
+      token.style.width = '';
+      token.classList.add('is-measuring');
+      measureToken(token);
+      token.classList.remove('is-measuring');
+      token.style.width = `${currentStep >= 2 ? token.dataset.toWidth : token.dataset.fromWidth}px`;
+    });
+    if (currentStep >= 1 && currentStep < 2) drawArcs();
+  };
+
+  const setStep = (step) => {
+    if (step === currentStep) return;
+    currentStep = step;
+    figure.dataset.step = String(step);
+    steps.forEach((item, n) => item.classList.toggle('is-active', n === step));
+    badTokens.forEach((token) => {
+      token.style.width = `${step >= 2 ? token.dataset.toWidth : token.dataset.fromWidth}px`;
+    });
+    if (step === 1) drawArcs();
+  };
+
+  const update = () => {
+    const rect = method.getBoundingClientRect();
+    const travel = rect.height - window.innerHeight;
+    const progress = travel > 0 ? clamp(-rect.top / travel) : 1;
+    figure.style.setProperty('--progress', progress.toFixed(4));
+    setStep(Math.min(2, Math.floor(progress * 3)));
+  };
+
+  (document.fonts?.ready ?? Promise.resolve()).then(() => {
+    layout();
+    update();
+    scrollHandlers.add(update);
+    window.addEventListener('resize', () => requestAnimationFrame(layout));
+  });
+}

@@ -87,8 +87,59 @@
         </div>
       </div>
     </section>
-    <!-- figures -->
-    <!-- method -->
+    <section class="figures" aria-label="Headline results">
+      <div class="wrap">
+        <dl class="figures-grid">
+          <div class="figure" data-reveal style="--delay:0">
+            <dt>Exact spelling accuracy</dt>
+            <dd><span data-count="83.23" data-decimals="2">83.23</span><small>%</small></dd>
+            <p>541 of 650 sentences in the spelling subset, character for character.</p>
+          </div>
+          <div class="figure" data-reveal style="--delay:90">
+            <dt>Less character error</dt>
+            <dd><span data-count="83.4" data-decimals="1">83.4</span><small>%</small></dd>
+            <p>Character error rate fell from 13.13% in the input to 2.18%.</p>
+          </div>
+          <div class="figure" data-reveal style="--delay:180">
+            <dt>Average CPU time</dt>
+            <dd><span data-count="344" data-decimals="0">344</span><small>ms</small></dd>
+            <p>Short inputs on a Ryzen 9 4900HS, with the model kept loaded.</p>
+          </div>
+          <div class="figure" data-reveal style="--delay:270">
+            <dt>Clean text left alone</dt>
+            <dd><span data-count="99" data-decimals="0">99</span><small>/101</small></dd>
+            <p>Already-correct inputs the model correctly declined to touch.</p>
+          </div>
+        </dl>
+        <p class="figures-note data" data-reveal>Measured, not marketed · <a class="link" href="/research#methodology">How these were scored</a></p>
+      </div>
+    </section>
+    <section class="section method" id="method" aria-labelledby="method-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker data" data-reveal><b>02</b> Method</p>
+          <h2 id="method-title" data-lines>It reads the sentence, <em>not&nbsp;the&nbsp;word.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">Conventional checkers judge one word at a time. TypoPilot reads the damage as a whole line, then makes the smallest correction it can justify.</p>
+        </div>
+      </div>
+      <div class="method-track" data-method>
+        <div class="method-sticky">
+          <div class="wrap method-grid">
+            <ol class="method-steps">
+              <li data-step="0"><span class="data">01</span><div><h3>Read the whole line</h3><p>The full sentence goes in, damage and all. Five spans are wrong — and one of them, a lone “c”, is meaningless on its own.</p></div></li>
+              <li data-step="1"><span class="data">02</span><div><h3>Let context decide</h3><p>Next to “to”, “arrangements” and “party”, that “c” can only be <em>see</em>. The surrounding words resolve what no dictionary could.</p></div></li>
+              <li data-step="2"><span class="data">03</span><div><h3>Make the smallest edit</h3><p>Five repairs. Every clean word — and the writer’s voice — stays exactly where it was.</p></div></li>
+            </ol>
+            <figure class="method-figure" data-method-figure>
+              <span class="method-ref data">EXT-005 · 357 ms · exact match</span>
+              <svg class="method-arcs" data-method-arcs aria-hidden="true"></svg>
+              <p class="method-sentence" data-method-sentence aria-label="I'll c to hte arrenemenst for tjhe pa rty. Corrected: I'll see to the arrangements for the party."><span class="tok">I'll</span> <span class="tok is-bad" data-tok="c"><span class="from">c</span><span class="to">see</span></span> <span class="tok">to</span> <span class="tok is-bad" data-tok="hte"><span class="from">hte</span><span class="to">the</span></span> <span class="tok is-bad" data-tok="arrenemenst"><span class="from">arrenemenst</span><span class="to">arrangements</span></span> <span class="tok">for</span> <span class="tok is-bad" data-tok="tjhe"><span class="from">tjhe</span><span class="to">the</span></span> <span class="tok is-bad" data-tok="pa rty."><span class="from">pa rty.</span><span class="to">party.</span></span></p>
+              <span class="method-progress" aria-hidden="true"><i></i></span>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- benchmarks -->
     <!-- evidence -->
     <!-- route -->
