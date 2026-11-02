@@ -620,3 +620,98 @@ p { text-wrap: pretty; }
   .method-steps li.is-active { display: grid; }
   .method-figure { padding-top: 4rem; }
 }
+
+/* ==========================================================================
+   Benchmarks — flight routes
+   ========================================================================== */
+
+.routes { border-top: 1px solid var(--ink); }
+.routes-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 1rem 0 1.5rem; color: var(--ink-mute);
+}
+.routes-clock b { font-weight: 500; color: var(--ink); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.routes-list { display: grid; }
+.route {
+  --p: 0;
+  display: grid; grid-template-columns: 12rem minmax(0, 1fr) 9rem; align-items: center; gap: var(--gutter);
+  padding-block: clamp(1.25rem, 2.6vw, 2rem);
+  border-top: 1px solid var(--rule);
+}
+.route-name strong, .route-result strong {
+  display: block;
+  font-family: var(--font-display); font-weight: 400; font-variation-settings: "opsz" 40;
+  font-size: var(--step-2); letter-spacing: -0.03em; line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.route-name span, .route-result span { color: var(--ink-mute); font-size: 0.9rem; }
+.route-result { text-align: right; }
+.route-result strong { color: var(--ink-mute); transition: color 0.6s var(--ease); }
+.route.is-arrived .route-result strong { color: var(--ink); }
+.route.is-lead.is-arrived .route-result strong { color: var(--signal); }
+
+.route-path { position: relative; height: 2.5rem; }
+.route-path::before {
+  /* the planned route, as long as the variant's latency */
+  content: ""; position: absolute; left: 0; top: 50%; height: 0;
+  width: calc(var(--end, 1) * 100%);
+  border-top: 1px dashed var(--rule-strong);
+}
+.route-path::after {
+  /* departure point */
+  content: ""; position: absolute; left: -4px; top: calc(50% - 4px); width: 8px; height: 8px;
+  border-radius: 50%; background: var(--ink);
+}
+.route-flown {
+  position: absolute; left: 0; right: 0; top: calc(50% - 0.5px); height: 1px;
+  background: var(--ink);
+  transform-origin: left; transform: scaleX(var(--p));
+}
+.route.is-lead .route-flown { background: var(--signal); height: 2px; top: calc(50% - 1px); }
+.route-arr {
+  position: absolute; left: calc(var(--end, 1) * 100% - 6px); top: calc(50% - 6px); width: 12px; height: 12px;
+  border-radius: 50%; border: 1px solid var(--ink-mute); background: var(--paper);
+  transition: background-color 0.5s var(--ease), border-color 0.5s var(--ease);
+}
+.route.is-arrived .route-arr { background: var(--ink); border-color: var(--ink); }
+.route.is-lead.is-arrived .route-arr { background: var(--signal); border-color: var(--signal); }
+.route-plane {
+  position: absolute; top: 50%; left: calc(var(--p) * 100%);
+  width: 1.9rem;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transition: opacity 0.5s var(--ease);
+}
+.route-plane svg { fill: var(--ink); }
+.route.is-lead .route-plane svg { fill: var(--signal); }
+.route.is-arrived .route-plane { opacity: 0; }
+.route.is-base { color: var(--ink-mute); }
+.route.is-base .route-arr { display: none; }
+.route.is-base .route-path::before { mask-image: linear-gradient(90deg, #000 70%, transparent); }
+.route.is-base .route-plane svg { fill: var(--ink-mute); }
+
+.routes-scale {
+  display: flex; justify-content: space-between;
+  margin-left: calc(12rem + var(--gutter)); margin-right: calc(9rem + var(--gutter));
+  padding-top: 0.75rem; border-top: 1px solid var(--rule);
+  color: var(--ink-mute);
+}
+
+.facts {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gutter);
+  margin-top: clamp(4rem, 8vw, 6rem);
+}
+.facts > div { padding-top: 1rem; border-top: 1px solid var(--rule-strong); }
+.facts dt { color: var(--ink-mute); font-size: 0.9rem; }
+.facts dd {
+  font-family: var(--font-display); font-weight: 380; font-variation-settings: "opsz" 40;
+  font-size: var(--step-2); letter-spacing: -0.03em; margin: 0.35rem 0 0.25rem;
+}
+.facts p { color: var(--ink-soft); font-size: 0.92rem; }
+.facts-note { margin-top: 2rem; color: var(--ink-mute); }
+
+@media (max-width: 60rem) {
+  .route { grid-template-columns: 1fr auto; row-gap: 0.75rem; }
+  .route-path { grid-column: 1 / -1; grid-row: 2; }
+  .routes-scale { margin: 0; }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2rem; }
+}

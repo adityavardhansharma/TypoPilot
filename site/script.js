@@ -668,3 +668,50 @@ if (method) {
     window.addEventListener('resize', () => requestAnimationFrame(layout));
   });
 }
+
+/* ---------- Benchmarks: scroll drives a shared clock; each variant lands at its latency ---------- */
+
+const routesFigure = document.querySelector('[data-routes]');
+if (routesFigure) {
+  const WINDOW_MS = 1200;
+  const clockEl = routesFigure.querySelector('[data-routes-clock]');
+  const routes = [...routesFigure.querySelectorAll('[data-route]')].map((el) => {
+    const ms = Number(el.dataset.ms);
+    el.style.setProperty('--end', clamp(ms / WINDOW_MS).toFixed(4));
+    return { el, ms };
+  });
+  let target = reducedMotion.matches ? WINDOW_MS : 0;
+  let shown = target;
+  let active = false;
+  let last = 0;
+
+  const paint = () => {
+    clockEl.textContent = String(Math.round(shown)).padStart(4, '0');
+    routes.forEach(({ el, ms }) => {
+      // Position on a shared time axis: every aircraft moves at the clock's pace and stops at its latency.
+      el.style.setProperty('--p', (Math.min(shown, ms) / WINDOW_MS).toFixed(4));
+      el.classList.toggle('is-arrived', shown >= ms - 0.5);
+    });
+  };
+  const loop = (now) => {
+    if (!active) return;
+    const dt = Math.min(0.05, (now - last) / 1000 || 0);
+    last = now;
+    shown += (target - shown) * (1 - Math.exp(-dt * 5));
+    paint();
+    requestAnimationFrame(loop);
+  };
+  scrollHandlers.add(() => {
+    if (!reducedMotion.matches) target = viewProgress(routesFigure, 0.85, 0.3) * WINDOW_MS;
+  });
+  if ('IntersectionObserver' in window && !reducedMotion.matches) {
+    new IntersectionObserver(([entry]) => {
+      active = entry.isIntersecting;
+      if (active) {
+        last = performance.now();
+        requestAnimationFrame(loop);
+      }
+    }).observe(routesFigure);
+  }
+  paint();
+}

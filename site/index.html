@@ -140,7 +140,53 @@
         </div>
       </div>
     </section>
-    <!-- benchmarks -->
+    <section class="section benchmarks" id="benchmarks" aria-labelledby="bench-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="kicker data" data-reveal><b>03</b> Benchmarks</p>
+          <h2 id="bench-title" data-lines>Same route, same cargo. <em>Q4_K_M&nbsp;lands&nbsp;first.</em></h2>
+          <p class="lede" data-reveal style="--delay:200">One fine-tuned model, eight test inputs, one laptop CPU. Quantising cut sentence latency and size without losing a single clean output.</p>
+        </div>
+
+        <figure class="routes" data-routes role="img" aria-label="Mean sentence latency. Q4_K_M 444 milliseconds, 8 of 8 clean. Q8 696 milliseconds, 8 of 8. F16 1,118 milliseconds, 7 of 8. Untuned base Q4 4,590 milliseconds, 0 of 8.">
+          <div class="routes-top data">
+            <span>Mean sentence latency on a shared clock · scroll to fly</span>
+            <span class="routes-clock">T + <b data-routes-clock>0000</b> ms</span>
+          </div>
+          <ol class="routes-list">
+            <li class="route is-lead" data-route data-ms="444">
+              <div class="route-name"><strong>Q4_K_M</strong><span>Fine-tuned · 770 MB</span></div>
+              <div class="route-path"><span class="route-flown"></span><span class="route-plane"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span class="route-arr"></span></div>
+              <div class="route-result"><strong>444 ms</strong><span>8 / 8 clean</span></div>
+            </li>
+            <li class="route " data-route data-ms="696">
+              <div class="route-name"><strong>Q8</strong><span>Fine-tuned · 1,260 MB</span></div>
+              <div class="route-path"><span class="route-flown"></span><span class="route-plane"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span class="route-arr"></span></div>
+              <div class="route-result"><strong>696 ms</strong><span>8 / 8 clean</span></div>
+            </li>
+            <li class="route " data-route data-ms="1118">
+              <div class="route-name"><strong>F16</strong><span>Fine-tuned · 2,365 MB</span></div>
+              <div class="route-path"><span class="route-flown"></span><span class="route-plane"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span class="route-arr"></span></div>
+              <div class="route-result"><strong>1,118 ms</strong><span>7 / 8 clean</span></div>
+            </li>
+            <li class="route is-base" data-route data-ms="4590">
+              <div class="route-name"><strong>Base Q4</strong><span>Untuned · 770 MB</span></div>
+              <div class="route-path"><span class="route-flown"></span><span class="route-plane"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M40 3c2 0 3 2 4 5l4 25 23 10v7l-24-5-2 20 10 7v5l-15-4-15 4v-5l10-7-2-20-24 5v-7l23-10 4-25c1-3 2-5 4-5Z"/></svg></span><span class="route-arr"></span></div>
+              <div class="route-result"><strong>4,590 ms</strong><span>0 / 8 · off chart →</span></div>
+            </li>
+          </ol>
+          <figcaption class="routes-scale data" aria-hidden="true"><span>0</span><span>300</span><span>600</span><span>900</span><span>1,200 ms</span></figcaption>
+        </figure>
+
+        <dl class="facts">
+          <div data-reveal><dt>Model size</dt><dd>770.3 MB</dd><p>67% smaller than F16</p></div>
+          <div data-reveal style="--delay:90"><dt>Clean outputs</dt><dd>8 / 8</dd><p>Seven sentences and a paragraph</p></div>
+          <div data-reveal style="--delay:180"><dt>Peak memory</dt><dd>1.30 GB</dd><p>Native working set</p></div>
+          <div data-reveal style="--delay:270"><dt>Median load</dt><dd>1.29 s</dd><p>Once, then kept in memory</p></div>
+        </dl>
+        <p class="facts-note data">Medians of three complete native CPU runs · AMD Ryzen 9 4900HS · AVX2 · 16 threads</p>
+      </div>
+    </section>
     <!-- evidence -->
     <!-- route -->
     <!-- closing -->
