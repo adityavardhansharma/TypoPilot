@@ -231,3 +231,52 @@ document.querySelectorAll('[data-spotlight]').forEach((card) => {
     card.style.setProperty('--my', `${event.clientY - rect.top}px`);
   });
 });
+
+/* ---------- 900-outcome dot field ---------- */
+
+const dotField = document.querySelector('[data-dot-field]');
+if (dotField) {
+  const outcomes = [
+    ['exact', 629, 'exact match'],
+    ['improved', 157, 'improved, not exact'],
+    ['over', 72, 'overcorrected'],
+    ['neutral', 42, 'other outcomes']
+  ];
+  const columns = 30;
+  const fragment = document.createDocumentFragment();
+  let index = 0;
+  outcomes.forEach(([className, total]) => {
+    for (let n = 0; n < total; n += 1) {
+      const dot = document.createElement('i');
+      dot.className = className;
+      // diagonal wave: dots further from the top-left corner arrive later
+      dot.style.setProperty('--d', `${(Math.floor(index / columns) + (index % columns)) * 14}ms`);
+      fragment.appendChild(dot);
+      index += 1;
+    }
+  });
+  dotField.appendChild(fragment);
+
+  const panel = dotField.closest('.dot-panel');
+  const readout = panel.querySelector('[data-dot-readout]');
+  const buttons = [...document.querySelectorAll('[data-filter]')];
+  let locked = null;
+  const focus = (key) => {
+    panel.dataset.focus = key || '';
+    const match = outcomes.find(([className]) => className === key);
+    readout.textContent = match ? `${match[1]} ${match[2]} · ${(match[1] / 9).toFixed(1)}%` : 'All outcomes';
+    buttons.forEach((button) => button.classList.toggle('is-active', button.dataset.filter === key));
+  };
+  buttons.forEach((button) => {
+    const key = button.dataset.filter;
+    button.addEventListener('pointerenter', () => focus(key));
+    button.addEventListener('pointerleave', () => focus(locked));
+    button.addEventListener('focus', () => focus(key));
+    button.addEventListener('blur', () => focus(locked));
+    button.addEventListener('click', () => {
+      locked = locked === key ? null : key;
+      buttons.forEach((other) => other.setAttribute('aria-pressed', String(other.dataset.filter === locked)));
+      focus(locked ?? key);
+    });
+  });
+}

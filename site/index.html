@@ -227,40 +227,52 @@
       </div>
     </section>
 
-    <section class="section shell evidence-section" aria-labelledby="evidence-title">
-      <div class="evidence-copy">
-        <p class="claim-tag">The complete 900-example suite</p>
-        <h2 id="evidence-title">Not a highlight reel. Every output is inspectable.</h2>
-        <p>The final model improved 687 inputs, exactly matched 629 references, and preserved 99 of 101 unchanged examples. The full report includes successes, misses, and overcorrections.</p>
-        <a class="button button-outline" href="/reports/llama-q4-900-eval-annotated.html">Inspect all 900 outputs <span aria-hidden="true">↗</span></a>
-      </div>
-      <div class="dot-evidence" role="img" aria-label="A field of 900 dots representing mutually exclusive evaluation outcomes: 629 exact, 157 improved but not exact, 72 overcorrected, and 42 other outcomes">
-        <div class="dot-legend">
-          <span><i class="dot exact"></i>629 exact</span>
-          <span><i class="dot improved"></i>157 improved, not exact</span>
-          <span><i class="dot over"></i>72 overcorrected</span>
-          <span><i class="dot neutral"></i>42 other</span>
+    <section class="section" id="evidence" aria-labelledby="evidence-title">
+      <div class="shell evidence-layout">
+        <div class="evidence-copy">
+          <div data-reveal>
+            <p class="eyebrow">The complete 900-example suite</p>
+            <h2 id="evidence-title">Not a highlight reel. <em>Every</em> output is inspectable.</h2>
+          </div>
+          <p data-reveal style="--delay:100">The final model improved 687 inputs, exactly matched 629 references, and preserved 99 of 101 unchanged examples. The full report includes successes, misses, and overcorrections.</p>
+          <div class="legend" data-stagger role="group" aria-label="Highlight an outcome">
+            <button type="button" class="legend-item" data-filter="exact" aria-pressed="false"><i class="dot exact"></i><strong>629</strong><span>exact match</span></button>
+            <button type="button" class="legend-item" data-filter="improved" aria-pressed="false"><i class="dot improved"></i><strong>157</strong><span>improved, not exact</span></button>
+            <button type="button" class="legend-item" data-filter="over" aria-pressed="false"><i class="dot over"></i><strong>72</strong><span>overcorrected</span></button>
+            <button type="button" class="legend-item" data-filter="neutral" aria-pressed="false"><i class="dot neutral"></i><strong>42</strong><span>other outcomes</span></button>
+          </div>
+          <a class="button" href="/reports/llama-q4-900-eval-annotated.html" data-reveal>Inspect all 900 outputs <span class="arrow" aria-hidden="true">↗</span></a>
         </div>
-        <div class="dot-matrix" data-dot-matrix aria-hidden="true"></div>
+        <div class="dot-panel panel" data-reveal style="--delay:150" role="img" aria-label="A field of 900 dots representing mutually exclusive evaluation outcomes: 629 exact, 157 improved but not exact, 72 overcorrected, and 42 other outcomes">
+          <div class="dot-panel-head mono"><span>n = 900</span><span data-dot-readout>All outcomes</span></div>
+          <div class="dot-field" data-dot-field aria-hidden="true"></div>
+        </div>
       </div>
     </section>
 
-    <section class="section local-section" aria-labelledby="local-title">
+    <section class="section local" aria-labelledby="local-title">
       <div class="shell local-layout">
-        <div class="local-visual" aria-hidden="true">
-          <div class="local-node input-node">Your text</div>
-          <div class="local-route"><span class="route-plane">✦</span></div>
-          <div class="local-node model-node">770 MB model</div>
-          <p>Nothing leaves the machine.</p>
+        <div class="device" data-reveal aria-hidden="true">
+          <span class="device-label mono">Your machine · 8-core laptop CPU</span>
+          <div class="flow">
+            <div class="node"><span>Your text</span><small class="mono is-coral">“hte”</small></div>
+            <div class="wire"><i></i></div>
+            <div class="node node-chip"><span>770 MB model</span><small class="mono">Q4_K_M · GGUF</small></div>
+            <div class="wire"><i></i></div>
+            <div class="node node-out"><span>Corrected</span><small class="mono is-lime">“the”</small></div>
+          </div>
+          <div class="cloud-blocked mono"><span>Cloud API</span><b>0 requests</b></div>
         </div>
         <div class="local-copy">
-          <p class="claim-tag">Local by design</p>
-          <h2 id="local-title">Context without the cloud round-trip.</h2>
-          <p>The final model runs through a native llama.cpp harness on an ordinary eight-core laptop CPU. Keeping the model loaded turns correction into a sub-second interaction for typical sentences.</p>
-          <dl class="spec-list">
-            <div><dt>Runtime</dt><dd>Native C++ · AVX2 · 16 threads</dd></div>
-            <div><dt>Format</dt><dd>GGUF · Q4_K_M</dd></div>
-            <div><dt>Median load</dt><dd>1.29 seconds</dd></div>
+          <div data-reveal>
+            <p class="eyebrow">Local by design</p>
+            <h2 id="local-title">Context without the <em>cloud</em> round-trip.</h2>
+          </div>
+          <p data-reveal style="--delay:100">The final model runs through a native llama.cpp harness on an ordinary eight-core laptop CPU. Keeping the model loaded turns correction into a sub-second interaction for typical sentences.</p>
+          <dl class="spec-list" data-stagger>
+            <div><dt class="mono">Runtime</dt><dd>Native C++ · AVX2 · 16 threads</dd></div>
+            <div><dt class="mono">Format</dt><dd>GGUF · Q4_K_M</dd></div>
+            <div><dt class="mono">Median load</dt><dd>1.29 seconds</dd></div>
           </dl>
         </div>
       </div>
